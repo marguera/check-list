@@ -37,7 +37,7 @@ export function WorkflowView({
   onDeleteWorkflow,
   knowledgeItems,
   selectedWorkflow: selectedWorkflowProp,
-  onWorkflowSelect,
+  onWorkflowSelect: _onWorkflowSelect,
   onBackToWorkflows,
   readOnly = false,
   getOrCreateWorkflowExecution,
