@@ -30,8 +30,8 @@ interface WorkflowViewProps {
 
 export function WorkflowView({
   project,
-  onBack,
-  onUpdateProject,
+  onBack: _onBack,
+  onUpdateProject: _onUpdateProject,
   onAddWorkflow,
   onUpdateWorkflow,
   onDeleteWorkflow,
@@ -51,7 +51,7 @@ export function WorkflowView({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentWorkflow, setCurrentWorkflow] = useState<Project['workflows'][0] | null>(null);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-  const [localSelectedWorkflow, setLocalSelectedWorkflow] = useState<Project['workflows'][0] | null>(null);
+  const [localSelectedWorkflow] = useState<Project['workflows'][0] | null>(null);
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
@@ -61,18 +61,6 @@ export function WorkflowView({
   
   // Use prop if provided, otherwise use local state
   const actualSelectedWorkflow = selectedWorkflowProp || localSelectedWorkflow;
-  
-  const handleWorkflowSelect = (workflow: Project['workflows'][0]) => {
-    if (onWorkflowSelect) {
-      onWorkflowSelect(workflow);
-    } else {
-      if (readOnly) {
-        navigate(`/${workflow.id}`);
-      } else {
-        navigate(`/projects/${project.id}/workflows/${workflow.id}`);
-      }
-    }
-  };
   
   const handleBackToWorkflows = () => {
     if (onBackToWorkflows) {

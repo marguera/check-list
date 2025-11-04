@@ -79,7 +79,7 @@ const KnowledgeDatabaseLink = Mark.create<KnowledgeDatabaseLinkOptions>({
   renderHTML({ HTMLAttributes, mark }) {
     return [
       'a',
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+      mergeAttributes(this.options.HTMLAttributes || {}, HTMLAttributes, {
         'data-knowledge-link': 'true',
         'data-knowledge-id': mark.attrs.id,
         'data-knowledge-title': mark.attrs.title,

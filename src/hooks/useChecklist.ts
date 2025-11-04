@@ -146,10 +146,6 @@ export function useChecklist() {
     });
   }, [updateChecklist]);
 
-  const completeTask = useCallback((taskId: string) => {
-    updateTask(taskId, { completed: true });
-  }, [updateTask]);
-
   const updateChecklistMetadata = useCallback((title: string, description: string) => {
     updateChecklist((prev) => ({
       ...prev,
@@ -166,7 +162,6 @@ export function useChecklist() {
     updateTask,
     deleteTask,
     reorderTasks,
-    completeTask,
     updateChecklistMetadata,
     addKnowledgeItem,
     updateKnowledgeItem,

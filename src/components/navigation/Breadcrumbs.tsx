@@ -27,7 +27,6 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
         <Home className="w-4 h-4" />
       </Link>
       {items.map((item, index) => {
-        const isLast = index === items.length - 1;
         const isActive = location.pathname === item.path;
 
         return (
