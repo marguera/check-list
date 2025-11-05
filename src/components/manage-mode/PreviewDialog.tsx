@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent } from '../ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../ui/dialog';
 import { ViewTaskList } from '../view-mode/TaskList';
 import { ViewTaskDialog } from '../view-mode/TaskDialog';
 import { Task, Project } from '../../types';
@@ -35,6 +35,8 @@ export function PreviewDialog({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 !gap-0 [&>button]:hidden !bg-[#19191A]">
+          <DialogTitle className="sr-only">Preview: {workflow.title}</DialogTitle>
+          <DialogDescription className="sr-only">Preview mode for workflow {workflow.title}</DialogDescription>
           <div className="bg-[#1F1F20] px-4 sm:px-6 py-4 border-b border-white/20" style={{ width: '100vw', marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}>
             <div className="flex items-center gap-3 max-w-4xl mx-auto relative">
               <button
