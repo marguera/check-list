@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Task, TaskImportance } from '../../types';
-import { Check, X, Upload, Flag, RotateCcw } from 'lucide-react';
+import { Check, X, Upload, Flag, RotateCcw, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent } from '../ui/dialog';
 
 interface TaskItemProps {
@@ -23,7 +23,7 @@ interface TaskItemProps {
 export function TaskItem({
   task,
   onEdit,
-  onDelete: _onDelete,
+  onDelete,
   onComplete: _onComplete,
   onImageUpdate,
   onImportanceChange,
@@ -300,18 +300,34 @@ export function TaskItem({
                     </p>
                   )}
                 </div>
-                {mode === 'edit' && onImportanceChange && (
-                  <button
-                    onClick={handleImportanceToggle}
-                    className={`transition-all p-1.5 rounded ${
-                      importance === 'high'
-                        ? 'text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100'
-                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-                    }`}
-                    title={importance === 'high' ? 'High importance (click to remove)' : 'Click to highlight as important'}
-                  >
-                    <Flag className={`w-4 h-4 ${importance === 'high' ? 'fill-current' : ''}`} />
-                  </button>
+                {mode === 'edit' && (
+                  <div className="flex items-center gap-1">
+                    {onImportanceChange && (
+                      <button
+                        onClick={handleImportanceToggle}
+                        className={`transition-all p-1.5 rounded ${
+                          importance === 'high'
+                            ? 'text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100'
+                            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                        }`}
+                        title={importance === 'high' ? 'High importance (click to remove)' : 'Click to highlight as important'}
+                      >
+                        <Flag className={`w-4 h-4 ${importance === 'high' ? 'fill-current' : ''}`} />
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete();
+                        }}
+                        className="transition-all p-1.5 rounded text-red-500 hover:text-red-700 hover:bg-red-50"
+                        title="Delete task"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
               {mode === 'edit' && (
