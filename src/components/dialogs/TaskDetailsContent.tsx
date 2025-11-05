@@ -6,6 +6,7 @@ import { ImagesTab } from './ImagesTab';
 import { extractKnowledgeLinkIds } from '../../utils/knowledgeLinks';
 import { extractImageUrls } from '../../utils/imageExtraction';
 import { isInstructionsEmpty } from '../../utils/instructions';
+import { Info, BookOpen, Image as ImageIcon } from 'lucide-react';
 
 interface TaskDetailsContentProps {
   task: Task;
@@ -72,16 +73,23 @@ export function TaskDetailsContent({
         <Tabs defaultValue={hasInstructions ? "instructions" : (hasKnowledgeLinks ? "knowledge" : "images")} className="w-full">
           <TabsList className={`grid w-full ${gridCols}`}>
             {hasInstructions && (
-              <TabsTrigger value="instructions">Instructions</TabsTrigger>
+              <TabsTrigger value="instructions" className="flex items-center justify-center gap-2">
+                <Info className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Instructions</span>
+              </TabsTrigger>
             )}
             {hasKnowledgeLinks && (
-              <TabsTrigger value="knowledge">
-                Knowledge Database ({getAllKnowledgeLinks().length})
+              <TabsTrigger value="knowledge" className="flex items-center justify-center gap-2">
+                <BookOpen className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Knowledge Database ({getAllKnowledgeLinks().length})</span>
+                <span className="sm:hidden">({getAllKnowledgeLinks().length})</span>
               </TabsTrigger>
             )}
             {hasImages && (
-              <TabsTrigger value="images">
-                Images ({imageUrls.length})
+              <TabsTrigger value="images" className="flex items-center justify-center gap-2">
+                <ImageIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Images ({imageUrls.length})</span>
+                <span className="sm:hidden">({imageUrls.length})</span>
               </TabsTrigger>
             )}
           </TabsList>
