@@ -68,25 +68,29 @@ export function ViewTaskItem({
       ? 'border-l-4 border-l-green-500 mb-2' 
       : 'mb-2';
     
-    let backgroundClass = 'bg-white/5';
-    let hoverClass = 'hover:bg-white/8';
+    let backgroundClass = 'bg-white/10';
+    let hoverClass = 'hover:bg-white/15';
     if (completed) {
       // Completed items have very subtle faded background
       if (importance === 'high') {
-        // Completed highlighted items: faded lighter white background
+        // Completed highlighted items: faded lighter white background (different from non-completed)
         backgroundClass = 'bg-white/5';
-        hoverClass = 'hover:bg-white/8';
+        hoverClass = 'hover:bg-white/10';
       } else {
-        backgroundClass = 'bg-white/3';
+        // Completed non-highlighted items
+        backgroundClass = 'bg-transparent';
         hoverClass = 'hover:bg-white/5';
       }
     } else if (importance === 'high') {
       // Non-completed highlighted items: lighter white background
-      backgroundClass = 'bg-white/10';
-      hoverClass = 'hover:bg-white/15';
+      backgroundClass = 'bg-white/20';
+      hoverClass = 'hover:bg-white/25';
     }
     
-    return `pt-4 ${hasUndoButton ? 'pb-3' : 'pb-4'} px-4 ${borderClasses} ${backgroundClass} cursor-pointer transition-colors ${hoverClass}`;
+    // Ensure hover class is always applied - put hover last to ensure it takes precedence
+    const classes = `pt-4 ${hasUndoButton ? 'pb-3' : 'pb-4'} px-4 ${borderClasses} ${backgroundClass} cursor-pointer transition-colors ${hoverClass}`;
+    
+    return classes;
   };
 
   const handleImageClick = (e: React.MouseEvent) => {
@@ -126,7 +130,7 @@ export function ViewTaskItem({
         data-task-id={task.id}
         data-completed-non-highlighted={isNonHighlightedCompleted ? 'true' : undefined}
         onClick={handleCardClick}
-        className={`transition-all ${getContainerClasses()}`}
+        className={`${getContainerClasses()}`}
       >
         <div className="flex flex-col">
           {/* Step Number */}

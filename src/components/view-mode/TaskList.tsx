@@ -24,12 +24,6 @@ export function ViewTaskList({
 }: ViewTaskListProps) {
   return (
     <>
-      <style>{`
-        /* Show divider only when a completed non-highlighted item is followed by another completed non-highlighted item */
-        [data-completed-non-highlighted="true"] + [data-completed-non-highlighted="true"] {
-          border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
-        }
-      `}</style>
       <div className="[&>div:last-child>div>div[data-task-id]]:border-b-0">
         {tasks.map((task) => (
           <ViewTaskItem
