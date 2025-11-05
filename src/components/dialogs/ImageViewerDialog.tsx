@@ -59,9 +59,8 @@ export function ImageViewerDialog({
     setScale(newScale);
   };
 
-  // Handle mouse drag
+  // Handle mouse drag - always draggable
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (scale <= 1) return;
     e.preventDefault();
     setIsDragging(true);
     setDragStart({
@@ -71,7 +70,7 @@ export function ImageViewerDialog({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || scale <= 1) return;
+    if (!isDragging) return;
     setPosition({
       x: e.clientX - dragStart.x,
       y: e.clientY - dragStart.y,
@@ -98,7 +97,7 @@ export function ImageViewerDialog({
         y: (touch1.clientY + touch2.clientY) / 2,
       };
       touchStartRef.current = { distance, center };
-    } else if (e.touches.length === 1 && scale > 1) {
+    } else if (e.touches.length === 1) {
       const touch = e.touches[0];
       setIsDragging(true);
       setDragStart({
@@ -132,7 +131,7 @@ export function ImageViewerDialog({
       
       setScale(newScale);
       touchStartRef.current.distance = distance;
-    } else if (e.touches.length === 1 && isDragging && scale > 1) {
+    } else if (e.touches.length === 1 && isDragging) {
       const touch = e.touches[0];
       setPosition({
         x: touch.clientX - dragStart.x,
@@ -172,57 +171,71 @@ export function ImageViewerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 flex flex-col">
+      <DialogContent className="!max-w-[100vw] !max-h-[100vh] !w-screen !h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !p-0 flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{alt}</DialogTitle>
         </DialogHeader>
-        {/* Toolbar */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={zoomOut}
-              disabled={scale <= 0.5}
-              title="Zoom out"
-            >
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-            <span className="text-sm text-slate-600 min-w-[60px] text-center">
-              {Math.round(scale * 100)}%
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={zoomIn}
-              disabled={scale >= 5}
-              title="Zoom in"
-            >
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={rotate}
-              title="Rotate"
-            >
-              <RotateCw className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetZoom}
-              title="Reset"
-            >
-              Reset
-            </Button>
-          </div>
+        
+        {/* Floating toolbar */}
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg px-3 py-2 border border-slate-200">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={zoomOut}
+            disabled={scale <= 0.5}
+            title="Zoom out"
+            className="h-8 w-8 p-0"
+          >
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-slate-700 min-w-[60px] text-center font-medium">
+            {Math.round(scale * 100)}%
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={zoomIn}
+            disabled={scale >= 5}
+            title="Zoom in"
+            className="h-8 w-8 p-0"
+          >
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+          <div className="w-px h-6 bg-slate-300 mx-1" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={rotate}
+            title="Rotate"
+            className="h-8 w-8 p-0"
+          >
+            <RotateCw className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={resetZoom}
+            title="Reset"
+            className="h-8 px-3 text-xs"
+          >
+            Reset
+          </Button>
+          <div className="w-px h-6 bg-slate-300 mx-1" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+            title="Close"
+            className="h-8 px-3 text-xs"
+          >
+            Close
+          </Button>
         </div>
 
-        {/* Image container */}
+        {/* Image container - fullscreen */}
         <div
           ref={containerRef}
-          className="flex-1 overflow-hidden bg-slate-100 flex items-center justify-center relative"
+          className="flex-1 overflow-hidden bg-black flex items-center justify-center relative w-full h-full"
           onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -232,18 +245,20 @@ export function ImageViewerDialog({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           style={{
-            cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
+            cursor: isDragging ? 'grabbing' : 'grab',
           }}
         >
           <img
             ref={imageRef}
             src={imageUrl}
             alt={alt}
-            className="max-w-full max-h-full select-none"
+            className="select-none"
             draggable={false}
             style={{
               transform: `translate(${position.x}px, ${position.y}px) scale(${scale}) rotate(${rotation}deg)`,
               transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+              maxWidth: 'none',
+              maxHeight: 'none',
             }}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
