@@ -224,20 +224,22 @@ export function TaskItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-2 gap-2">
             <div className="flex-1">
-              <h3 className={`${styles.title} mb-1 ${
+              <h3 className={`${styles.title} ${task.description ? 'mb-1' : ''} ${
                 completed 
                   ? 'text-slate-500 line-through' 
                   : 'text-slate-900'
               }`}>
                 Step {task.stepNumber} - {task.title}
               </h3>
-              <p className={`${styles.description} line-clamp-2 ${
-                completed 
-                  ? 'text-slate-400' 
-                  : 'text-slate-600'
-              }`}>
-                {task.description}
-              </p>
+              {task.description && (
+                <p className={`${styles.description} line-clamp-2 ${
+                  completed 
+                    ? 'text-slate-400' 
+                    : 'text-slate-600'
+                }`}>
+                  {task.description}
+                </p>
+              )}
             </div>
             {mode === 'edit' && onImportanceChange && (
               <button
