@@ -46,6 +46,9 @@ export function TaskItem({
     ? isTaskCompleted(workflowId, workflowVersion, task.id)
     : false;
 
+  // Check if this is the active step (current incomplete step)
+  const isActiveStep = mode === 'view' && !completed && currentStepTaskId === task.id;
+
   // Get importance with default to 'low'
   // Handle legacy 'medium' values by converting to 'low'
   const importance: TaskImportance = (task.importance === 'high' ? 'high' : 'low');
@@ -129,6 +132,10 @@ export function TaskItem({
     e.stopPropagation();
     // Only allow full-size viewing in view mode
     if (task.imageUrl && mode === 'view') {
+      // Blur any focused element to prevent aria-hidden conflicts when dialog opens
+      if (document.activeElement && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
       setFullImageOpen(true);
     }
   };
@@ -178,6 +185,11 @@ export function TaskItem({
       target.closest('a')
     ) {
       return;
+    }
+    
+    // Blur any focused element to prevent aria-hidden conflicts when dialog opens
+    if (document.activeElement && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
     }
     
     onEdit();
@@ -274,22 +286,25 @@ export function TaskItem({
               <div className="flex items-start justify-between mb-2 gap-1 sm:gap-2">
                 <div className="flex-1 min-w-0">
                   <div className={`flex items-center gap-2 flex-wrap ${task.description ? 'mb-1' : ''}`}>
-                    <h3 className={`${styles.title} ${
+                    <h3 className={`${styles.title} m-0 inline-block align-middle ${
                       completed 
                         ? 'text-slate-500 line-through' 
                         : 'text-slate-900'
                     } break-words`}>
                       {task.title}
                     </h3>
-                    {/* Show completion check inline at end of title in view mode */}
+                    {/* Show completion check and text as unified element */}
                     {mode === 'view' && completed && (
-                      <span title="Task completed">
-                        <Check className={`${styles.checkSize} text-green-600 flex-shrink-0`} />
+                      <span className="inline-flex items-center gap-1 flex-shrink-0 align-middle" title="Task completed">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <span className="text-xs font-medium text-green-600 uppercase">COMPLETED</span>
                       </span>
                     )}
-                    {/* Show step number after title on larger screens */}
-                    {mode === 'view' && completed && (
-                      <span className="text-xs sm:text-sm font-medium text-green-600 hidden sm:inline flex-shrink-0">step {task.stepNumber}</span>
+                    {/* Show current badge after title for active step */}
+                    {isActiveStep && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 flex-shrink-0">
+                        CURRENT
+                      </span>
                     )}
                   </div>
                   {task.description && (
@@ -373,6 +388,10 @@ export function TaskItem({
       {task.imageUrl && (
         <Dialog open={fullImageOpen} onOpenChange={setFullImageOpen}>
           <DialogContent className="max-w-4xl p-0">
+            <DialogHeader className="sr-only">
+              <DialogTitle>{task.title}</DialogTitle>
+              <DialogDescription>Full-size image viewer for {task.title}</DialogDescription>
+            </DialogHeader>
             <div className="relative">
               <button
                 onClick={() => setFullImageOpen(false)}

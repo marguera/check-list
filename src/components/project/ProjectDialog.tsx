@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Project } from '../../types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { Button } from '../ui/button';
 
 interface ProjectDialogProps {
@@ -47,6 +47,9 @@ export function ProjectDialog({
           <DialogTitle>
             {mode === 'add' ? 'Add Project' : 'Edit Project'}
           </DialogTitle>
+          <DialogDescription>
+            {mode === 'add' ? 'Create a new project to organize your workflows' : 'Edit the project details'}
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div>

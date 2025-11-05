@@ -2,10 +2,12 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogTitle,
+  DialogDescription,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Task, KnowledgeItem } from '../../types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MobileViewHeader } from '../ui/MobileViewHeader';
 import { MobileViewContainer } from '../ui/MobileViewContainer';
 import { TaskDetailsContent } from '../dialogs/TaskDetailsContent';
@@ -32,6 +34,15 @@ export function TaskCompletionDialog({
   const [viewingItem, setViewingItem] = useState<KnowledgeItem | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (open) {
+      // Blur any focused element in the background to prevent aria-hidden conflicts
+      if (document.activeElement && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    }
+  }, [open]);
+
   if (!task) return null;
 
   return (
@@ -41,6 +52,12 @@ export function TaskCompletionDialog({
       >
         <div className="w-full h-full flex flex-col">
           <DialogHeader className="px-0 pt-0 pb-0 border-0">
+            <DialogTitle className="sr-only">
+              Complete Task
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Review the task details and confirm completion
+            </DialogDescription>
             <MobileViewHeader
               title="Complete Task"
               onBack={() => onOpenChange(false)}
@@ -67,13 +84,13 @@ export function TaskCompletionDialog({
               {/* Confirmation Checkbox */}
               <div className="pt-6 mt-6 border-t border-slate-200 pb-4">
                 <h3 className="font-semibold text-slate-900 mb-3">Confirmation Required</h3>
-                <div className="flex items-start space-x-2">
+                <div className="flex items-center space-x-2.5">
                   <input
                     type="checkbox"
                     id="confirm-checkbox"
                     checked={confirmed}
                     onChange={(e) => setConfirmed(e.target.checked)}
-                    className="mt-1 h-4 w-4 text-slate-600 focus:ring-slate-500 border-slate-300 rounded"
+                    className="h-5 w-5 accent-green-600 focus:accent-green-600 focus:outline-none focus:ring-0 border-slate-300 rounded"
                   />
                   <label
                     htmlFor="confirm-checkbox"

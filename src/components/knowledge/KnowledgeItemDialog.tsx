@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { KnowledgeItem } from '../../types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { TipTapEditor } from '../editor/TipTapEditor';
 
@@ -51,6 +51,9 @@ export function KnowledgeItemDialog({
           <DialogTitle>
             {mode === 'add' ? 'Add Knowledge Item' : 'Edit Knowledge Item'}
           </DialogTitle>
+          <DialogDescription>
+            {mode === 'add' ? 'Create a new knowledge item for your database' : 'Edit the knowledge item details'}
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div>

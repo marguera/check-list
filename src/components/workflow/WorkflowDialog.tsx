@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Project } from '../../types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { Button } from '../ui/button';
 
 interface WorkflowDialogProps {
@@ -47,6 +47,9 @@ export function WorkflowDialog({
           <DialogTitle>
             {mode === 'add' ? 'Add Workflow' : 'Edit Workflow'}
           </DialogTitle>
+          <DialogDescription>
+            {mode === 'add' ? 'Create a new workflow for your project' : 'Edit the workflow details'}
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div>

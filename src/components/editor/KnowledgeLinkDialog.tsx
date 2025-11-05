@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
@@ -35,6 +36,7 @@ export function KnowledgeLinkDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Select Knowledge Item</DialogTitle>
+          <DialogDescription>Choose a knowledge item to link</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <input

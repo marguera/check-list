@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
@@ -174,6 +175,7 @@ export function ImageViewerDialog({
       <DialogContent className="!max-w-[100vw] !max-h-[100vh] !w-screen !h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !p-0 flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{alt}</DialogTitle>
+          <DialogDescription>Image viewer</DialogDescription>
         </DialogHeader>
         
         {/* Floating toolbar */}

@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { KnowledgeItem } from '../../types';
 import { useState, useEffect, useRef } from 'react';
 import { MobileViewHeader } from '../ui/MobileViewHeader';
@@ -26,6 +26,11 @@ export function KnowledgeItemViewer({
     if (!open) {
       setHistory([]);
       setCurrentItem(null);
+    } else {
+      // Blur any focused element in the background to prevent aria-hidden conflicts
+      if (document.activeElement && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
     }
   }, [open]);
 
@@ -95,6 +100,12 @@ export function KnowledgeItemViewer({
       >
         <div className="w-full h-full flex flex-col">
           <DialogHeader className="px-0 pt-0 pb-0 border-0">
+            <DialogTitle className="sr-only">
+              {currentItem.title}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {currentItem.description || 'Knowledge item details'}
+            </DialogDescription>
             <MobileViewHeader
               title={currentItem.title}
               onBack={history.length > 0 ? handleBack : () => onOpenChange(false)}
