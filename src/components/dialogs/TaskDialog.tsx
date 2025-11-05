@@ -19,6 +19,7 @@ import { extractImageUrls } from '../../utils/imageExtraction';
 import { isInstructionsEmpty } from '../../utils/instructions';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
 import { ImageViewerDialog } from './ImageViewerDialog';
+import { Check } from 'lucide-react';
 
 interface TaskDialogProps {
   open: boolean;
@@ -131,7 +132,7 @@ export function TaskDialog({
         <div className="w-full h-full flex flex-col">
           <DialogHeader className="px-0 pt-0 pb-0 border-0">
             <MobileViewHeader
-              title={mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : ''}
+              title={mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : (isCompleted ? 'Completed Step' : '')}
               onBack={() => onOpenChange(false)}
               showBackButton={true}
             />
@@ -141,18 +142,35 @@ export function TaskDialog({
             <MobileViewContainer>
               {isViewMode && task ? (
                 <>
-                  <TaskDetailsContent
-                    task={task}
-                    knowledgeItems={knowledgeItems}
-                    mode="view"
-                    onKnowledgeLinkClick={(item) => {
-                      setViewingItem(item);
-                      setViewerOpen(true);
-                    }}
-                    onImageClick={(imageUrl) => {
-                      setSelectedImage(imageUrl);
-                    }}
-                  />
+                  {/* Completed Step Indicator */}
+                  {isCompleted && (
+                    <div className="mb-4 pb-4 border-b border-slate-200">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
+                          <Check className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-green-700">Step Completed</div>
+                          <div className="text-xs text-slate-500">This step has been completed. You are viewing it for reference.</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className={isCompleted ? 'opacity-75' : ''}>
+                    <TaskDetailsContent
+                      task={task}
+                      knowledgeItems={knowledgeItems}
+                      mode="view"
+                      onKnowledgeLinkClick={(item) => {
+                        setViewingItem(item);
+                        setViewerOpen(true);
+                      }}
+                      onImageClick={(imageUrl) => {
+                        setSelectedImage(imageUrl);
+                      }}
+                    />
+                  </div>
                   
                   {/* Confirmation Checkbox - only show for current incomplete step */}
                   {!isCompleted && isCurrentStep && onComplete && (

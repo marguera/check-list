@@ -194,8 +194,12 @@ export function TaskItem({
       >
         {/* Layout: Column with buttons on new line for all screen sizes */}
         <div className="flex flex-col">
+          {/* Step Number */}
+          <div className="text-slate-600 font-semibold text-xs sm:text-sm mb-1">
+            STEP {task.stepNumber}
+          </div>
           {/* Main content row (image + content) */}
-          <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
+          <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
             {/* Image/Icon */}
             {task.imageUrl ? (
               <div className="flex-shrink-0">
@@ -273,8 +277,6 @@ export function TaskItem({
                         ? 'text-slate-500 line-through' 
                         : 'text-slate-900'
                     } break-words`}>
-                      <span className="hidden sm:inline">Step {task.stepNumber} - </span>
-                      <span className="sm:hidden">{task.stepNumber}. </span>
                       {task.title}
                     </h3>
                     {/* Show completion check inline at end of title in view mode */}
@@ -328,7 +330,6 @@ export function TaskItem({
                 </button>
               )}
             </div>
-
           </div>
 
           {/* Actions - New line below content for all screen sizes */}
