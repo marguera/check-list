@@ -102,7 +102,7 @@ export function KnowledgeItemViewer({
             />
           </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
           <MobileViewContainer>
             {currentItem.description && (
               <p className="text-lg text-slate-600 mb-6">{currentItem.description}</p>

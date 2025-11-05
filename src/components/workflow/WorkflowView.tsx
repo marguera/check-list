@@ -278,7 +278,7 @@ export function WorkflowView({
     return (
       <div>
         {readOnly ? (
-          <>
+          <div className="w-full h-screen flex flex-col fixed inset-0 bg-slate-50">
             {/* Header matching dialog style - full width */}
             <MobileViewHeader
               title={actualSelectedWorkflow.title}
@@ -286,31 +286,52 @@ export function WorkflowView({
               showBackButton={true}
             />
             
-            {/* Description and progress below header */}
-            <MobileViewContainer className="mb-6">
-              {actualSelectedWorkflow.description && (
-                <p className="text-lg text-slate-600 mb-4">{actualSelectedWorkflow.description}</p>
-              )}
-              
-              {/* Progress Bar */}
-              <div className="mb-2">
-                <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-slate-600">
-                    {completedTasks} of {totalTasks} tasks completed
-                  </span>
-                  <span className="font-semibold text-slate-900">
-                    {progressPercentage}%
-                  </span>
+            {/* Scrollable content area */}
+            <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
+              <MobileViewContainer>
+                {/* Description and progress below header */}
+                {actualSelectedWorkflow.description && (
+                  <p className="text-lg text-slate-600 mb-4">{actualSelectedWorkflow.description}</p>
+                )}
+                
+                {/* Progress Bar */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-slate-600">
+                      {completedTasks} of {totalTasks} tasks completed
+                    </span>
+                    <span className="font-semibold text-slate-900">
+                      {progressPercentage}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-2">
+                    <div
+                      className="bg-slate-900 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${progressPercentage}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-slate-200 rounded-full h-2">
-                  <div
-                    className="bg-slate-900 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${progressPercentage}%` }}
-                  />
-                </div>
-              </div>
-            </MobileViewContainer>
-          </>
+
+                <TaskList
+                  tasks={actualSelectedWorkflow.tasks}
+                  onTaskEdit={handleViewTaskDetails}
+                  onTaskDelete={() => {}}
+                  onTaskComplete={handleCompleteTask}
+                  onTaskImageUpdate={undefined}
+                  onTaskImportanceChange={undefined}
+                  onReorderTasks={() => {}}
+                  onInsertTask={() => {}}
+                  mode="view"
+                  workflowId={actualSelectedWorkflow.id}
+                  workflowVersion={actualSelectedWorkflow.version || 1}
+                  isTaskCompleted={isTaskCompleted}
+                  currentStepTaskId={currentStepTaskId}
+                  lastCompletedTaskId={lastCompletedTaskId}
+                  onUndo={handleUndo}
+                />
+              </MobileViewContainer>
+            </div>
+          </div>
         ) : (
           <div className="flex items-center gap-4 mb-6">
             <div className="flex-1">
@@ -340,23 +361,25 @@ export function WorkflowView({
             </div>
           )}
 
-        <TaskList
-          tasks={actualSelectedWorkflow.tasks}
-          onTaskEdit={handleViewTaskDetails}
-          onTaskDelete={readOnly ? () => {} : handleDeleteTask}
-          onTaskComplete={readOnly ? handleCompleteTask : () => {}} // Disable completion in manage mode
-          onTaskImageUpdate={readOnly ? undefined : handleTaskImageUpdate}
-          onTaskImportanceChange={readOnly ? undefined : handleTaskImportanceChange}
-          onReorderTasks={readOnly ? () => {} : handleReorderTasks}
-          onInsertTask={readOnly ? () => {} : handleInsertTask}
-          mode={readOnly ? 'view' : listMode}
-          workflowId={actualSelectedWorkflow.id}
-          workflowVersion={actualSelectedWorkflow.version || 1}
-          isTaskCompleted={isTaskCompleted}
-          currentStepTaskId={readOnly ? currentStepTaskId : null}
-          lastCompletedTaskId={readOnly ? lastCompletedTaskId : null}
-          onUndo={readOnly ? handleUndo : undefined}
-        />
+        {!readOnly && (
+          <TaskList
+            tasks={actualSelectedWorkflow.tasks}
+            onTaskEdit={handleViewTaskDetails}
+            onTaskDelete={handleDeleteTask}
+            onTaskComplete={() => {}} // Disable completion in manage mode
+            onTaskImageUpdate={handleTaskImageUpdate}
+            onTaskImportanceChange={handleTaskImportanceChange}
+            onReorderTasks={handleReorderTasks}
+            onInsertTask={handleInsertTask}
+            mode={listMode}
+            workflowId={actualSelectedWorkflow.id}
+            workflowVersion={actualSelectedWorkflow.version || 1}
+            isTaskCompleted={isTaskCompleted}
+            currentStepTaskId={null}
+            lastCompletedTaskId={null}
+            onUndo={undefined}
+          />
+        )}
 
         <TaskDialog
           open={taskDialogOpen}
