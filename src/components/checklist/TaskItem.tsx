@@ -117,9 +117,28 @@ export function TaskItem({
     onImportanceChange?.(newImportance);
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Only handle card clicks in view mode
+    if (mode !== 'view') return;
+    
+    // Don't trigger if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === 'BUTTON' ||
+      target.tagName === 'A' ||
+      target.closest('button') ||
+      target.closest('a')
+    ) {
+      return;
+    }
+    
+    onEdit();
+  };
+
   return (
     <>
       <div
+        onClick={handleCardClick}
         className={`
           mb-4 transition-all
           ${completed 
@@ -130,6 +149,7 @@ export function TaskItem({
           }
           ${styles.padding}
           ${isDragging ? 'opacity-50' : ''}
+          ${mode === 'view' ? 'cursor-pointer' : ''}
         `}
       >
         <div className="flex gap-4">
@@ -233,19 +253,21 @@ export function TaskItem({
               </button>
             )}
           </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-            className={`text-sm font-medium underline ${
-              completed
-                ? 'text-slate-400 hover:text-slate-500'
-                : 'text-blue-600 hover:text-blue-700'
-            }`}
-          >
-            {mode === 'view' ? 'View Details' : 'Add/Edit Details'}
-          </button>
+          {mode === 'edit' && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+              className={`text-sm font-medium underline ${
+                completed
+                  ? 'text-slate-400 hover:text-slate-500'
+                  : 'text-blue-600 hover:text-blue-700'
+              }`}
+            >
+              Add/Edit Details
+            </button>
+          )}
         </div>
 
         {/* Actions */}
