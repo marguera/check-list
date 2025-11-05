@@ -22,22 +22,36 @@ export function ViewTaskList({
   lastCompletedTaskId,
   onUndo,
 }: ViewTaskListProps) {
+  // Helper to check if a task is non-highlighted (low importance)
+  const isNonHighlighted = (task: Task) => {
+    return task.importance !== 'high';
+  };
+
   return (
     <>
       <div className="[&>div:last-child>div>div[data-task-id]]:border-b-0">
-        {tasks.map((task) => (
-          <ViewTaskItem
-            key={task.id}
-            task={task}
-            onEdit={() => onTaskEdit(task)}
-            workflowId={workflowId}
-            workflowVersion={workflowVersion}
-            isTaskCompleted={isTaskCompleted}
-            currentStepTaskId={currentStepTaskId}
-            lastCompletedTaskId={lastCompletedTaskId}
-            onUndo={onUndo}
-          />
-        ))}
+        {tasks.map((task, index) => {
+          // Show divider if current item is non-highlighted and previous item was also non-highlighted
+          const showDivider = index > 0 && isNonHighlighted(task) && isNonHighlighted(tasks[index - 1]);
+          
+          return (
+            <div key={task.id}>
+              {showDivider && (
+                <div className="h-[1px] bg-white/10 mb-[2px]" />
+              )}
+              <ViewTaskItem
+                task={task}
+                onEdit={() => onTaskEdit(task)}
+                workflowId={workflowId}
+                workflowVersion={workflowVersion}
+                isTaskCompleted={isTaskCompleted}
+                currentStepTaskId={currentStepTaskId}
+                lastCompletedTaskId={lastCompletedTaskId}
+                onUndo={onUndo}
+              />
+            </div>
+          );
+        })}
       </div>
     </>
   );

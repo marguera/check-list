@@ -42,14 +42,14 @@ export function ViewTaskItem({
     switch (importance) {
       case 'high':
         return {
-          title: 'text-2xl font-semibold',
+          title: 'text-xl font-semibold',
           description: 'text-base',
           imageSize: 'w-16 h-16 sm:w-24 sm:h-24',
         };
       case 'low':
       default:
         return {
-          title: 'text-lg font-medium',
+          title: 'text-base font-medium',
           description: 'text-sm',
           imageSize: 'w-16 h-16 sm:w-24 sm:h-24',
         };
@@ -63,13 +63,12 @@ export function ViewTaskItem({
     const hasUndoButton = completed && lastCompletedTaskId === task.id && onUndo;
     
     // All items have the same spacing
-    // CSS will handle showing dividers between completed non-highlighted items
     const borderClasses = isActiveStep 
-      ? 'border-l-4 border-l-green-500 mb-2' 
-      : 'mb-2';
+      ? 'border-l-4 border-l-green-500 mb-[2px]' 
+      : 'mb-[2px]';
     
-    let backgroundClass = 'bg-white/10';
-    let hoverClass = 'hover:bg-white/15';
+    let backgroundClass = 'bg-white/0';
+    let hoverClass = 'hover:bg-white/5';
     if (completed) {
       // Completed items have very subtle faded background
       if (importance === 'high') {
@@ -83,8 +82,8 @@ export function ViewTaskItem({
       }
     } else if (importance === 'high') {
       // Non-completed highlighted items: lighter white background
-      backgroundClass = 'bg-white/20';
-      hoverClass = 'hover:bg-white/25';
+      backgroundClass = 'bg-white/5';
+      hoverClass = 'hover:bg-white/10';
     }
     
     // Ensure hover class is always applied - put hover last to ensure it takes precedence
