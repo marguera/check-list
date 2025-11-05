@@ -77,7 +77,7 @@ export function TipTapEditor({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl mx-auto min-h-[300px] p-4 focus:outline-none',
+        class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl mx-auto min-h-[300px] p-4 focus:outline-none bg-[#1F1F20] text-white',
       },
       handlePaste: (_view, event) => {
         const items = Array.from(event.clipboardData?.items || []);
@@ -274,16 +274,16 @@ export function TipTapEditor({
   ];
 
   return (
-    <div className="border border-slate-300 rounded-lg overflow-hidden focus:outline-none focus:ring-0 focus-visible:outline-none focus-within:ring-2 focus-within:ring-slate-500 focus-within:border-slate-500">
+    <div className="border border-white/20 rounded-lg overflow-hidden focus:outline-none focus:ring-0 focus-visible:outline-none focus-within:ring-2 focus-within:ring-white/50 focus-within:border-white/50 bg-[#1F1F20]">
       {editable && (
-        <div className="border-b border-slate-200 p-2 flex gap-2 flex-wrap">
+        <div className="border-b border-white/20 p-2 flex gap-2 flex-wrap bg-[#1F1F20]">
           <div className="relative">
             <select
               value={getCurrentHeading()}
               onChange={(e) => handleHeadingChange(e.target.value)}
-              className="appearance-none bg-white border border-slate-300 rounded-md px-3 py-1.5 pr-8 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 cursor-pointer"
+              className="appearance-none bg-[#1F1F20] border border-white/20 rounded-md px-3 py-1.5 pr-8 text-sm font-medium text-white/70 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 cursor-pointer"
               style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23334155' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 0.5rem center',
                 paddingRight: '2rem',
@@ -296,12 +296,15 @@ export function TipTapEditor({
               ))}
             </select>
           </div>
-          <div className="w-px bg-slate-200 mx-1" />
+          <div className="w-px bg-white/20 mx-1" />
           <Button
             type="button"
             variant={editor.isActive('bold') ? 'default' : 'ghost'}
             size="sm"
             onClick={() => editor.chain().focus().toggleBold().run()}
+            className={editor.isActive('bold') 
+              ? 'bg-blue-600 text-white hover:bg-blue-700' 
+              : 'text-white/70 hover:bg-white/10 hover:text-white'}
           >
             <Bold className="h-4 w-4" />
           </Button>
@@ -310,15 +313,21 @@ export function TipTapEditor({
             variant={editor.isActive('italic') ? 'default' : 'ghost'}
             size="sm"
             onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={editor.isActive('italic') 
+              ? 'bg-blue-600 text-white hover:bg-blue-700' 
+              : 'text-white/70 hover:bg-white/10 hover:text-white'}
           >
             <Italic className="h-4 w-4" />
           </Button>
-          <div className="w-px bg-slate-200 mx-1" />
+          <div className="w-px bg-white/20 mx-1" />
           <Button
             type="button"
             variant={editor.isActive('bulletList') ? 'default' : 'ghost'}
             size="sm"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
+            className={editor.isActive('bulletList') 
+              ? 'bg-blue-600 text-white hover:bg-blue-700' 
+              : 'text-white/70 hover:bg-white/10 hover:text-white'}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -327,15 +336,21 @@ export function TipTapEditor({
             variant={editor.isActive('orderedList') ? 'default' : 'ghost'}
             size="sm"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            className={editor.isActive('orderedList') 
+              ? 'bg-blue-600 text-white hover:bg-blue-700' 
+              : 'text-white/70 hover:bg-white/10 hover:text-white'}
           >
             <ListOrdered className="h-4 w-4" />
           </Button>
-          <div className="w-px bg-slate-200 mx-1" />
+          <div className="w-px bg-white/20 mx-1" />
           <Button
             type="button"
             variant={editor.isActive('link') ? 'default' : 'ghost'}
             size="sm"
             onClick={addLink}
+            className={editor.isActive('link') 
+              ? 'bg-blue-600 text-white hover:bg-blue-700' 
+              : 'text-white/70 hover:bg-white/10 hover:text-white'}
           >
             <LinkIcon className="h-4 w-4" />
           </Button>
@@ -344,18 +359,20 @@ export function TipTapEditor({
             variant="ghost"
             size="sm"
             onClick={addImage}
+            className="text-white/70 hover:bg-white/10 hover:text-white"
           >
             <ImageIcon className="h-4 w-4" />
           </Button>
           {showKnowledgeLinkButton && (
             <>
-              <div className="w-px bg-slate-200 mx-1" />
+              <div className="w-px bg-white/20 mx-1" />
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={openKnowledgeLinkDialog}
                 title="Insert knowledge database link"
+                className="text-white/70 hover:bg-white/10 hover:text-white"
               >
                 <BookOpen className="h-4 w-4" />
               </Button>
@@ -365,7 +382,7 @@ export function TipTapEditor({
       )}
       <EditorContent 
         editor={editor} 
-        className="prose max-w-none focus:outline-none focus:ring-0 focus-visible:outline-none"
+        className="prose max-w-none focus:outline-none focus:ring-0 focus-visible:outline-none bg-[#1F1F20] text-white"
       />
       <input
         type="file"
@@ -383,45 +400,53 @@ export function TipTapEditor({
       <style>{`
         .ProseMirror {
           outline: none;
+          color: white;
         }
         .ProseMirror h1 {
           font-size: 2em;
           font-weight: bold;
           margin: 0.67em 0;
           line-height: 1.2;
+          color: white;
         }
         .ProseMirror h2 {
           font-size: 1.5em;
           font-weight: bold;
           margin: 0.75em 0;
           line-height: 1.3;
+          color: white;
         }
         .ProseMirror h3 {
           font-size: 1.17em;
           font-weight: bold;
           margin: 0.83em 0;
           line-height: 1.4;
+          color: white;
         }
         .ProseMirror h4 {
           font-size: 1em;
           font-weight: bold;
           margin: 1em 0;
           line-height: 1.5;
+          color: white;
         }
         .ProseMirror h5 {
           font-size: 0.83em;
           font-weight: bold;
           margin: 1.17em 0;
           line-height: 1.5;
+          color: white;
         }
         .ProseMirror h6 {
           font-size: 0.67em;
           font-weight: bold;
           margin: 1.33em 0;
           line-height: 1.5;
+          color: white;
         }
         .ProseMirror p {
           margin: 0.5em 0;
+          color: white;
         }
         .ProseMirror ul,
         .ProseMirror ol {
@@ -437,19 +462,22 @@ export function TipTapEditor({
         .ProseMirror li {
           margin: 0.25em 0;
           display: list-item;
+          color: white;
         }
         .ProseMirror a {
-          color: #2563eb;
+          color: #60a5fa;
           text-decoration: underline;
         }
         .ProseMirror a:hover {
-          color: #1d4ed8;
+          color: #93c5fd;
         }
         .ProseMirror strong {
           font-weight: bold;
+          color: white;
         }
         .ProseMirror em {
           font-style: italic;
+          color: white;
         }
         /* Image node styles */
         .ProseMirror .image-node-wrapper {
@@ -518,7 +546,7 @@ export function TipTapEditor({
           transition: background-color 0.2s, color 0.2s;
         }
         .ProseMirror .align-button:hover {
-          background-color: #e5e7eb !important;
+          background-color: rgba(255, 255, 255, 0.1) !important;
         }
         .ProseMirror .align-button.active {
           background-color: #3b82f6 !important;

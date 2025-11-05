@@ -7,19 +7,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from '../ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
 import { Button } from '../ui/button';
-import { MobileViewHeader } from '../ui/MobileViewHeader';
-import { MobileViewContainer } from '../ui/MobileViewContainer';
+import { ArrowLeft } from 'lucide-react';
 import { InstructionsTab } from './InstructionsTab';
-import { ManageKnowledgeDatabaseTab } from './KnowledgeDatabaseTab';
-import { ManageImagesTab } from './ImagesTab';
 import { Task, KnowledgeItem } from '../../types';
 import { extractKnowledgeLinkIds } from '../../utils/knowledgeLinks';
-import { extractImageUrls } from '../../utils/imageExtraction';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
 import { ImageViewerDialog } from '../dialogs/ImageViewerDialog';
-import { Info, BookOpen, Image as ImageIcon } from 'lucide-react';
 
 interface ManageTaskDialogProps {
   open: boolean;
@@ -89,44 +83,35 @@ export function ManageTaskDialog({
     }
   };
 
-  const getAllKnowledgeLinks = () => {
-    const extractedIds = extractKnowledgeLinkIds(instructions || '');
-    return [...new Set([...knowledgeLinks, ...extractedIds])];
-  };
-
-  const getAllImages = () => {
-    return extractImageUrls(instructions || '');
-  };
-
-  const imageUrls = getAllImages();
-  const hasImages = imageUrls.length > 0;
-  const hasKnowledgeLinks = getAllKnowledgeLinks().length > 0;
-  const hasInstructions = true; // Always show instructions tab in edit/add mode
-  const tabCount = (hasInstructions ? 1 : 0) + (hasKnowledgeLinks ? 1 : 0) + (hasImages ? 1 : 0);
-  const gridCols = tabCount === 1 ? 'grid-cols-1' : tabCount === 2 ? 'grid-cols-2' : 'grid-cols-3';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 !gap-0 [&>button]:hidden"
+        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 !bg-white flex flex-col p-0 !gap-0 [&>button]:hidden"
       >
-        <div className="w-full h-full flex flex-col">
-          <DialogHeader className="px-0 pt-0 pb-0 border-0 !space-y-0">
-            <DialogTitle className="sr-only">
-              {mode === 'add' ? 'Add Task' : 'Edit Task'}
-            </DialogTitle>
+        <div className="w-full h-full flex flex-col bg-white">
+          <DialogHeader className="px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </Button>
+              <DialogTitle className="text-lg font-semibold text-slate-900 flex-1">
+                {mode === 'add' ? 'Add Task' : 'Edit Task'}
+              </DialogTitle>
+            </div>
             <DialogDescription className="sr-only">
               {mode === 'add' ? 'Add a new task to the workflow' : 'Edit the task details'}
             </DialogDescription>
-            <MobileViewHeader
-              title={mode === 'add' ? 'Add Task' : 'Edit Task'}
-              onBack={() => onOpenChange(false)}
-              showBackButton={true}
-            />
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4">
-            <MobileViewContainer>
+            <div className="max-w-4xl mx-auto">
               <div className="space-y-6 mb-4">
                 <div>
                   <label className="text-sm font-medium text-slate-700 mb-2 block">
@@ -154,70 +139,28 @@ export function ManageTaskDialog({
                 </div>
               </div>
 
-              {tabCount > 0 && (
-                <Tabs defaultValue={hasInstructions ? "instructions" : (hasKnowledgeLinks ? "knowledge" : "images")} className="w-full">
-                  <TabsList className={`grid w-full ${gridCols}`}>
-                    {hasInstructions && (
-                      <TabsTrigger value="instructions" className="flex items-center justify-center gap-2">
-                        <Info className="w-4 h-4 flex-shrink-0" />
-                        <span className="hidden sm:inline">Instructions</span>
-                      </TabsTrigger>
-                    )}
-                    {hasKnowledgeLinks && (
-                      <TabsTrigger value="knowledge" className="flex items-center justify-center gap-2">
-                        <BookOpen className="w-4 h-4 flex-shrink-0" />
-                        <span className="hidden sm:inline">Knowledge Database ({getAllKnowledgeLinks().length})</span>
-                        <span className="sm:hidden">({getAllKnowledgeLinks().length})</span>
-                      </TabsTrigger>
-                    )}
-                    {hasImages && (
-                      <TabsTrigger value="images" className="flex items-center justify-center gap-2">
-                        <ImageIcon className="w-4 h-4 flex-shrink-0" />
-                        <span className="hidden sm:inline">Images ({imageUrls.length})</span>
-                        <span className="sm:hidden">({imageUrls.length})</span>
-                      </TabsTrigger>
-                    )}
-                  </TabsList>
-                  {hasInstructions && (
-                    <TabsContent value="instructions" className="mt-4">
-                      <InstructionsTab
-                        instructions={instructions}
-                        onInstructionsChange={setInstructions}
-                        knowledgeItems={knowledgeItems}
-                        onKnowledgeLinkInserted={handleKnowledgeLinkInserted}
-                        editable={true}
-                        taskId={task?.id}
-                      />
-                    </TabsContent>
-                  )}
-                  {hasKnowledgeLinks && (
-                    <TabsContent value="knowledge" className="mt-4">
-                      <ManageKnowledgeDatabaseTab
-                        linkedItemIds={knowledgeLinks}
-                        knowledgeItems={knowledgeItems}
-                        instructions={instructions}
-                      />
-                    </TabsContent>
-                  )}
-                  {hasImages && (
-                    <TabsContent value="images" className="mt-4">
-                      <ManageImagesTab imageUrls={imageUrls} />
-                    </TabsContent>
-                  )}
-                </Tabs>
-              )}
-            </MobileViewContainer>
+              <div className="mt-6">
+                <InstructionsTab
+                  instructions={instructions}
+                  onInstructionsChange={setInstructions}
+                  knowledgeItems={knowledgeItems}
+                  onKnowledgeLinkInserted={handleKnowledgeLinkInserted}
+                  editable={true}
+                  taskId={task?.id}
+                />
+              </div>
+            </div>
           </div>
 
           <DialogFooter className="px-6 pb-6 pt-4 border-t">
-            <MobileViewContainer>
+            <div className="max-w-4xl mx-auto w-full flex justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
               <Button onClick={handleSave}>
                 {mode === 'add' ? 'Add Task' : 'Save Changes'}
               </Button>
-            </MobileViewContainer>
+            </div>
           </DialogFooter>
         </div>
       </DialogContent>
