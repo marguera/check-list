@@ -205,26 +205,11 @@ export function TaskList({
         items={tasks.map((task) => task.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div>
+        <div className={mode === 'view' ? '[&>div:last-child>div>div[data-task-id]]:border-b-0' : ''}>
           {mode === 'edit' && <AddTaskButton onClick={() => onInsertTask(0)} />}
-          {tasks.map((task, index) => {
-            const currentTaskCompleted = isTaskCompletedCheck(task);
-            const previousTaskCompleted = index > 0 && isTaskCompletedCheck(tasks[index - 1]);
-            const currentTaskIsLowImportance = task.importance !== 'high';
-            const previousTaskIsLowImportance = index > 0 && tasks[index - 1].importance !== 'high';
-            // Only show divider between completed low-importance tasks
-            const showDivider = mode === 'view' && 
-              currentTaskCompleted && 
-              previousTaskCompleted &&
-              currentTaskIsLowImportance &&
-              previousTaskIsLowImportance;
-
-            return (
-              <div key={task.id}>
-                {showDivider && (
-                  <div className="border-t border-slate-200 my-2" />
-                )}
-                <SortableTaskItem
+          {tasks.map((task, index) => (
+            <div key={task.id}>
+              <SortableTaskItem
                   task={task}
                   onEdit={() => onTaskEdit(task)}
                   onDelete={() => onTaskDelete(task.id)}
@@ -239,10 +224,9 @@ export function TaskList({
                   lastCompletedTaskId={lastCompletedTaskId}
                   onUndo={onUndo}
                 />
-                {mode === 'edit' && <AddTaskButton onClick={() => onInsertTask(index + 1)} />}
-              </div>
-            );
-          })}
+              {mode === 'edit' && <AddTaskButton onClick={() => onInsertTask(index + 1)} />}
+            </div>
+          ))}
         </div>
       </SortableContext>
     </DndContext>

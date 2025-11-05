@@ -58,7 +58,7 @@ export function TaskItem({
           border: 'border border-slate-200',
           padding: 'p-5',
           background: 'bg-amber-100',
-          imageSize: 'w-24 h-24',
+          imageSize: 'w-16 h-16 sm:w-24 sm:h-24',
           checkSize: 'w-6 h-6',
         };
       case 'low':
@@ -69,13 +69,56 @@ export function TaskItem({
           border: 'border border-slate-200',
           padding: 'p-4',
           background: 'bg-white',
-          imageSize: 'w-24 h-24',
+          imageSize: 'w-16 h-16 sm:w-24 sm:h-24',
           checkSize: 'w-5 h-5',
         };
     }
   };
 
   const styles = getImportanceStyles();
+
+  // Build container classes - flat list style for both mobile and desktop
+  const getContainerClasses = () => {
+    if (mode === 'view') {
+      // Flat list style with dividers and horizontal padding for all screen sizes
+      // Check if buttons will be shown to adjust bottom padding
+      const hasButtons = (!completed && currentStepTaskId === task.id) || 
+                         (completed && lastCompletedTaskId === task.id && onUndo);
+      // Check if this is the active step (current incomplete step)
+      const isActiveStep = !completed && currentStepTaskId === task.id;
+      // Use pt-4 for top padding, adjust bottom padding to match spacing
+      // When buttons are present, they add mt-1 spacing, so we need more padding to match
+      // Base background: white for incomplete, transparent for completed
+      // Active steps have left green border and bottom divider, others just have bottom border
+      const borderClasses = isActiveStep 
+        ? 'border-l-4 border-l-green-600 border-b border-slate-200' 
+        : 'border-b border-slate-200';
+      // Background: high importance gets amber, completed high importance gets subtle darker, completed others get transparent, others get white
+      let backgroundClass = 'bg-white';
+      if (completed) {
+        if (importance === 'high') {
+          backgroundClass = 'bg-slate-100';
+        } else {
+          backgroundClass = 'bg-transparent';
+        }
+      } else if (importance === 'high') {
+        backgroundClass = 'bg-amber-50';
+      }
+      const baseClasses = `pt-4 ${hasButtons ? 'pb-3' : 'pb-4'} px-4 ${borderClasses} ${backgroundClass}`;
+      return baseClasses;
+    } else {
+      // Edit mode: card style
+      const baseClasses = `mb-4 ${styles.background} ${styles.border} rounded-lg hover:shadow-md ${styles.padding}`;
+      if (completed) {
+        if (importance === 'high') {
+          return `mb-4 bg-slate-100 rounded-lg ${styles.padding}`;
+        } else {
+          return `mb-4 bg-transparent border-none shadow-none ${styles.padding}`;
+        }
+      }
+      return baseClasses;
+    }
+  };
 
   const handleImageClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -141,193 +184,183 @@ export function TaskItem({
         data-task-id={task.id}
         onClick={handleCardClick}
         className={`
-          mb-4 transition-all
-          ${completed 
-            ? (importance === 'high' 
-                ? 'bg-slate-100 rounded-lg' 
-                : 'bg-transparent border-none shadow-none')
-            : `${styles.background} ${styles.border} rounded-lg hover:shadow-md`
-          }
-          ${styles.padding}
+          transition-all
+          ${getContainerClasses()}
           ${isDragging ? 'opacity-50' : ''}
           ${mode === 'view' ? 'cursor-pointer' : ''}
         `}
       >
-        <div className="flex gap-4">
-          {/* Image/Icon */}
-          {task.imageUrl ? (
-            <div className="flex-shrink-0">
-              <div className="relative group">
-                {mode === 'view' ? (
-                  <button
-                    onClick={handleImageClick}
-                    className={`${styles.imageSize} bg-slate-100 rounded-lg overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity`}
-                    title="Click to view full size"
-                  >
-                    <img
-                      src={task.imageUrl}
-                      alt={task.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ) : (
-                  <>
-                    <div className={`${styles.imageSize} bg-slate-100 rounded-lg overflow-hidden relative`}>
+        {/* Layout: Column with buttons on new line for all screen sizes */}
+        <div className="flex flex-col">
+          {/* Main content row (image + content) */}
+          <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
+            {/* Image/Icon */}
+            {task.imageUrl ? (
+              <div className="flex-shrink-0">
+                <div className="relative group">
+                  {mode === 'view' ? (
+                    <button
+                      onClick={handleImageClick}
+                      className={`${styles.imageSize} bg-slate-100 rounded-lg overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity`}
+                      title="Click to view full size"
+                    >
                       <img
                         src={task.imageUrl}
                         alt={task.title}
                         className="w-full h-full object-cover"
                       />
-                      <button
-                        onClick={handleRemoveImage}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                        title="Remove image"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={handleUploadClick}
-                        className="absolute top-1 left-1 bg-blue-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-600"
-                        title="Replace image"
-                      >
-                        <Upload className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </>
+                    </button>
+                  ) : (
+                    <>
+                      <div className={`${styles.imageSize} bg-slate-100 rounded-lg overflow-hidden relative`}>
+                        <img
+                          src={task.imageUrl}
+                          alt={task.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          onClick={handleRemoveImage}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                          title="Remove image"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={handleUploadClick}
+                          className="absolute top-1 left-1 bg-blue-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-600"
+                          title="Replace image"
+                        >
+                          <Upload className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              mode === 'edit' && (
+                <div className="flex-shrink-0">
+                  <button
+                    onClick={handleUploadClick}
+                    className={`${styles.imageSize} bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-100 transition-all flex flex-col items-center justify-center gap-1.5 text-slate-600 hover:text-slate-700 group`}
+                    title="Add image"
+                  >
+                    <Upload className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-medium">Add Image</span>
+                  </button>
+                </div>
+              )
+            )}
+            {mode === 'edit' && (
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+            )}
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between mb-2 gap-1 sm:gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className={`flex items-center gap-2 flex-wrap ${task.description ? 'mb-1' : ''}`}>
+                    <h3 className={`${styles.title} ${
+                      completed 
+                        ? 'text-slate-500 line-through' 
+                        : 'text-slate-900'
+                    } break-words`}>
+                      <span className="hidden sm:inline">Step {task.stepNumber} - </span>
+                      <span className="sm:hidden">{task.stepNumber}. </span>
+                      {task.title}
+                    </h3>
+                    {/* Show completion check inline at end of title in view mode */}
+                    {mode === 'view' && completed && (
+                      <Check className={`${styles.checkSize} text-green-600 flex-shrink-0`} title="Task completed" />
+                    )}
+                    {/* Show "Completed" text after title on larger screens */}
+                    {mode === 'view' && completed && (
+                      <span className="text-xs sm:text-sm font-medium text-green-600 hidden sm:inline flex-shrink-0">Completed</span>
+                    )}
+                  </div>
+                  {task.description && (
+                    <p className={`${styles.description} line-clamp-2 ${
+                      completed 
+                        ? 'text-slate-400' 
+                        : 'text-slate-600'
+                    }`}>
+                      {task.description}
+                    </p>
+                  )}
+                </div>
+                {mode === 'edit' && onImportanceChange && (
+                  <button
+                    onClick={handleImportanceToggle}
+                    className={`transition-all p-1.5 rounded ${
+                      importance === 'high'
+                        ? 'text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100'
+                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                    }`}
+                    title={importance === 'high' ? 'High importance (click to remove)' : 'Click to highlight as important'}
+                  >
+                    <Flag className={`w-4 h-4 ${importance === 'high' ? 'fill-current' : ''}`} />
+                  </button>
                 )}
               </div>
-            </div>
-          ) : (
-            mode === 'edit' && (
-              <div className="flex-shrink-0">
-                <button
-                  onClick={handleUploadClick}
-                  className={`${styles.imageSize} bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-100 transition-all flex flex-col items-center justify-center gap-1.5 text-slate-600 hover:text-slate-700 group`}
-                  title="Add image"
-                >
-                  <Upload className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-medium">Add Image</span>
-                </button>
-              </div>
-            )
-          )}
-          {mode === 'edit' && (
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-          )}
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between mb-2 gap-2">
-            <div className="flex-1">
-              <h3 className={`${styles.title} ${task.description ? 'mb-1' : ''} ${
-                completed 
-                  ? 'text-slate-500 line-through' 
-                  : 'text-slate-900'
-              }`}>
-                Step {task.stepNumber} - {task.title}
-              </h3>
-              {task.description && (
-                <p className={`${styles.description} line-clamp-2 ${
-                  completed 
-                    ? 'text-slate-400' 
-                    : 'text-slate-600'
-                }`}>
-                  {task.description}
-                </p>
-              )}
-            </div>
-            {mode === 'edit' && onImportanceChange && (
-              <button
-                onClick={handleImportanceToggle}
-                className={`transition-all p-1.5 rounded ${
-                  importance === 'high'
-                    ? 'text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100'
-                    : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-                }`}
-                title={importance === 'high' ? 'High importance (click to remove)' : 'Click to highlight as important'}
-              >
-                <Flag className={`w-4 h-4 ${importance === 'high' ? 'fill-current' : ''}`} />
-              </button>
-            )}
-          </div>
-          {mode === 'edit' && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
-              className={`text-sm font-medium underline ${
-                completed
-                  ? 'text-slate-400 hover:text-slate-500'
-                  : 'text-blue-600 hover:text-blue-700'
-              }`}
-            >
-              Add/Edit Details
-            </button>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex-shrink-0 flex items-start gap-2">
-          {mode === 'view' && (
-            <>
-              {/* Show completion button only for current step (first incomplete task) */}
-              {!completed && currentStepTaskId === task.id && (
+              {mode === 'edit' && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onComplete();
+                    onEdit();
                   }}
-                  className="text-blue-600 hover:text-blue-700 cursor-pointer transition-colors px-3 py-1.5 text-sm font-medium bg-blue-50 hover:bg-blue-100 rounded-md"
-                  title="Complete this step"
+                  className={`text-sm font-medium underline ${
+                    completed
+                      ? 'text-slate-400 hover:text-slate-500'
+                      : 'text-blue-600 hover:text-blue-700'
+                  }`}
                 >
-                  Complete Step
+                  Add/Edit Details
                 </button>
               )}
-              {/* Show completed status and undo button for completed tasks */}
-              {completed && (
-                <div className="flex flex-col items-end gap-2">
-                  <div className="text-green-600 flex items-center gap-1.5" title="Task completed">
-                    <Check className={`${styles.checkSize} text-green-600`} />
-                    <span className="text-sm font-medium">Completed</span>
-                  </div>
-                  {/* Show undo button only for the last completed task */}
-                  {lastCompletedTaskId === task.id && onUndo && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onUndo();
-                      }}
-                      className="text-white bg-slate-900 hover:bg-slate-800 cursor-pointer transition-colors px-3 py-1.5 text-xs font-medium rounded-md flex items-center gap-1.5"
-                      title="Uncheck this step"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                      Uncheck
-                    </button>
-                  )}
+            </div>
+
+          </div>
+
+          {/* Actions - New line below content for all screen sizes */}
+          {mode === 'view' && (
+            <>
+              {!completed && currentStepTaskId === task.id && (
+                <div className="flex flex-col gap-2 mt-1">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onComplete();
+                    }}
+                    className="text-white bg-green-600 hover:bg-green-700 cursor-pointer transition-colors px-3 py-1.5 text-sm font-medium rounded-md w-full"
+                    title="Complete this step"
+                  >
+                    Complete Step
+                  </button>
+                </div>
+              )}
+              {completed && lastCompletedTaskId === task.id && onUndo && (
+                <div className="flex flex-col gap-2 mt-1">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUndo();
+                    }}
+                    className="text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer transition-colors px-3 py-1.5 text-xs font-medium rounded-md flex items-center justify-center gap-1.5 w-full"
+                    title="Uncheck this step"
+                  >
+                    <RotateCcw className="w-3 h-3 flex-shrink-0" />
+                    Uncheck
+                  </button>
                 </div>
               )}
             </>
           )}
-          {mode === 'edit' && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              className="text-slate-400 hover:text-red-600 transition-colors"
-              title="Delete task"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
-          )}
-        </div>
         </div>
       </div>
 

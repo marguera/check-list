@@ -334,15 +334,15 @@ export function WorkflowView({
             />
             
             {/* Scrollable content area */}
-            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4">
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto min-h-0 py-4">
               <MobileViewContainer>
                 {/* Description and progress below header */}
                 {actualSelectedWorkflow.description && (
-                  <p className="text-lg text-slate-600 mb-4">{actualSelectedWorkflow.description}</p>
+                  <p className="text-lg text-slate-600 mb-4 px-4">{actualSelectedWorkflow.description}</p>
                 )}
                 
                 {/* Progress Bar */}
-                <div className="mb-6">
+                <div className="mb-6 px-4">
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span className="text-slate-600">
                       {completedTasks} of {totalTasks} tasks completed
