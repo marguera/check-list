@@ -220,6 +220,7 @@ export function InstructionsTab({
         open={viewerOpen}
         onOpenChange={setViewerOpen}
         item={viewingItem}
+        knowledgeItems={knowledgeItems}
       />
       <ImageViewerDialog
         open={!!selectedImage}
@@ -257,6 +258,7 @@ export function InstructionsTab({
         open={viewerOpen}
         onOpenChange={setViewerOpen}
         item={viewingItem}
+        knowledgeItems={knowledgeItems}
       />
     </div>
   );

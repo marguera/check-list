@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Project, Task, TaskImportance } from '../../types';
 import { Button } from '../ui/button';
 import { Plus, Edit, Trash2, ListTodo, ArrowLeft, ArrowRight } from 'lucide-react';
+import { MobileViewHeader } from '../ui/MobileViewHeader';
+import { MobileViewContainer } from '../ui/MobileViewContainer';
 import { WorkflowDialog } from './WorkflowDialog';
 import { TaskList } from '../checklist/TaskList';
 import { TaskDialog } from '../dialogs/TaskDialog';
@@ -275,28 +277,22 @@ export function WorkflowView({
 
     return (
       <div>
-        {readOnly && (
-          <div className="mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleBackToWorkflows}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-          </div>
-        )}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
-              {!readOnly ? `Workflow: ${actualSelectedWorkflow.title}` : actualSelectedWorkflow.title}
-            </h1>
-            <p className="text-slate-600 mb-3">{actualSelectedWorkflow.description}</p>
+        {readOnly ? (
+          <>
+            {/* Header matching dialog style - full width */}
+            <MobileViewHeader
+              title={actualSelectedWorkflow.title}
+              onBack={handleBackToWorkflows}
+              showBackButton={true}
+            />
             
-            {/* Progress Bar - only show in view/user/check mode (readOnly) */}
-            {readOnly && (
+            {/* Description and progress below header */}
+            <MobileViewContainer className="mb-6">
+              {actualSelectedWorkflow.description && (
+                <p className="text-lg text-slate-600 mb-4">{actualSelectedWorkflow.description}</p>
+              )}
+              
+              {/* Progress Bar */}
               <div className="mb-2">
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="text-slate-600">
@@ -313,10 +309,20 @@ export function WorkflowView({
                   />
                 </div>
               </div>
-            )}
+            </MobileViewContainer>
+          </>
+        ) : (
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                Workflow: {actualSelectedWorkflow.title}
+              </h1>
+              <p className="text-slate-600 mb-3">{actualSelectedWorkflow.description}</p>
+            </div>
           </div>
+        )}
           {!readOnly && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-6">
               <Button
                 variant={listMode === 'edit' ? 'default' : 'outline'}
                 onClick={() => setListMode('edit')}
@@ -333,7 +339,6 @@ export function WorkflowView({
               </Button>
             </div>
           )}
-        </div>
 
         <TaskList
           tasks={actualSelectedWorkflow.tasks}

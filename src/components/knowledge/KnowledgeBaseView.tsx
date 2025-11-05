@@ -151,6 +151,7 @@ export function KnowledgeBaseView({
         open={viewerOpen}
         onOpenChange={setViewerOpen}
         item={viewingItem}
+        knowledgeItems={knowledgeItems}
       />
     </div>
   );

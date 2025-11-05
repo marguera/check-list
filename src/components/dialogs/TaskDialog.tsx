@@ -8,6 +8,9 @@ import {
 } from '../ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
 import { Button } from '../ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { MobileViewHeader } from '../ui/MobileViewHeader';
+import { MobileViewContainer } from '../ui/MobileViewContainer';
 import { InstructionsTab } from './InstructionsTab';
 import { KnowledgeDatabaseTab } from './KnowledgeDatabaseTab';
 import { ImagesTab } from './ImagesTab';
@@ -156,20 +159,24 @@ export function TaskDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
         ref={dialogContentRef}
-        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0"
+        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 [&>button]:hidden"
         onOpenAutoFocus={(e) => {
           if (isViewMode) {
             e.preventDefault();
           }
         }}
       >
-        <DialogHeader className="px-6 pt-6 pb-4 border-b">
-          <DialogTitle className="text-2xl">
-            {mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : 'Task Details'}
-          </DialogTitle>
-        </DialogHeader>
+        <div className="w-full h-full flex flex-col">
+          <DialogHeader className="px-0 pt-0 pb-0 border-0">
+            <MobileViewHeader
+              title={mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : 'Task Details'}
+              onBack={() => onOpenChange(false)}
+              showBackButton={true}
+            />
+          </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            <MobileViewContainer>
           <div className="space-y-6 mb-4">
             {isViewMode ? (
               <>
@@ -388,7 +395,23 @@ export function TaskDialog({
               </TabsContent>
           )}
         </Tabs>
-      </div>
+            </MobileViewContainer>
+          </div>
+
+          {!isViewMode && (
+            <DialogFooter className="px-6 pb-6 pt-4 border-t">
+              <MobileViewContainer>
+                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSave}>
+                  {mode === 'add' ? 'Add Task' : 'Save Changes'}
+                </Button>
+              </MobileViewContainer>
+            </DialogFooter>
+          )}
+        </div>
+      </DialogContent>
 
       <KnowledgeItemViewer
         open={viewerOpen}
@@ -402,18 +425,6 @@ export function TaskDialog({
         imageUrl={selectedImage}
         alt="Image preview"
       />
-
-      <DialogFooter className="px-6 pb-6 pt-4 border-t">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {isViewMode ? 'Close' : 'Cancel'}
-          </Button>
-          {!isViewMode && (
-            <Button onClick={handleSave}>
-              {mode === 'add' ? 'Add Task' : 'Save Changes'}
-            </Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
     </Dialog>
   );
 }

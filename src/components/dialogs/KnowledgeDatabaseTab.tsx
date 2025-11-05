@@ -70,6 +70,7 @@ export function KnowledgeDatabaseTab({
         open={viewerOpen}
         onOpenChange={setViewerOpen}
         item={viewingItem}
+        knowledgeItems={knowledgeItems}
       />
     </>
   );

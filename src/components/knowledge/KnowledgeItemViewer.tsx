@@ -1,38 +1,119 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader } from '../ui/dialog';
 import { KnowledgeItem } from '../../types';
+import { useState, useEffect, useRef } from 'react';
+import { MobileViewHeader } from '../ui/MobileViewHeader';
+import { MobileViewContainer } from '../ui/MobileViewContainer';
 
 interface KnowledgeItemViewerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item: KnowledgeItem | null;
+  knowledgeItems?: KnowledgeItem[];
 }
 
 export function KnowledgeItemViewer({
   open,
   onOpenChange,
   item,
+  knowledgeItems = [],
 }: KnowledgeItemViewerProps) {
-  if (!item) return null;
+  const [currentItem, setCurrentItem] = useState<KnowledgeItem | null>(item);
+  const [history, setHistory] = useState<KnowledgeItem[]>([]);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Reset state when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setHistory([]);
+      setCurrentItem(null);
+    }
+  }, [open]);
+
+  // Update currentItem when item prop changes (but preserve history)
+  useEffect(() => {
+    if (item && open) {
+      // Only reset history if this is a new item (not from navigation)
+      setCurrentItem(prev => {
+        if (!prev || prev.id !== item.id) {
+          setHistory([]);
+          return item;
+        }
+        return prev;
+      });
+    }
+  }, [item?.id, open]);
+
+  // Handle clicks on knowledge links in content
+  useEffect(() => {
+    if (!open || !currentItem || knowledgeItems.length === 0) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const contentElement = contentRef.current;
+      if (!contentElement) return;
+
+      // Only handle clicks within the knowledge content area
+      if (!contentElement.contains(target)) return;
+
+      // Check for knowledge links
+      const link = target.closest('a[data-knowledge-link]') as HTMLAnchorElement;
+      if (link) {
+        e.preventDefault();
+        const knowledgeId = link.getAttribute('data-knowledge-id');
+        if (knowledgeId) {
+          const linkedItem = knowledgeItems.find(item => item.id === knowledgeId);
+          if (linkedItem && linkedItem.id !== currentItem.id) {
+            // Push current item to history and navigate to linked item
+            setHistory(prev => [...prev, currentItem]);
+            setCurrentItem(linkedItem);
+          }
+        }
+        return;
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => {
+      document.removeEventListener('click', handleClick);
+    };
+  }, [open, currentItem, knowledgeItems]);
+
+  const handleBack = () => {
+    if (history.length > 0) {
+      const previousItem = history[history.length - 1];
+      setHistory(prev => prev.slice(0, -1));
+      setCurrentItem(previousItem);
+    }
+  };
+
+  if (!currentItem) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0"
+        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 [&>button]:hidden"
       >
-        <DialogHeader className="px-6 pt-6 pb-4 border-b">
-          <DialogTitle className="text-2xl">{item.title}</DialogTitle>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-y-auto px-6 py-6">
-          {item.description && (
-            <p className="text-lg text-slate-600 mb-6">{item.description}</p>
-          )}
-          <div className="prose prose-lg max-w-none">
-            <div 
-              className="knowledge-content"
-              dangerouslySetInnerHTML={{ __html: item.content || '' }}
+        <div className="w-full h-full flex flex-col">
+          <DialogHeader className="px-0 pt-0 pb-0 border-0">
+            <MobileViewHeader
+              title={currentItem.title}
+              onBack={history.length > 0 ? handleBack : () => onOpenChange(false)}
+              showBackButton={true}
             />
-            <style>{`
+          </DialogHeader>
+
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <MobileViewContainer>
+            {currentItem.description && (
+              <p className="text-lg text-slate-600 mb-6">{currentItem.description}</p>
+            )}
+            <div className="prose prose-lg max-w-none">
+              <div 
+                ref={contentRef}
+                className="knowledge-content"
+                dangerouslySetInnerHTML={{ __html: currentItem.content || '' }}
+              />
+              <style>{`
               .knowledge-content h1 {
                 font-size: 2em;
                 font-weight: bold;
@@ -104,6 +185,16 @@ export function KnowledgeItemViewer({
               .knowledge-content a:hover {
                 color: #1d4ed8;
               }
+              .knowledge-content a[data-knowledge-link] {
+                color: #2563eb;
+                text-decoration: underline;
+                cursor: pointer;
+                pointer-events: auto;
+              }
+              .knowledge-content a[data-knowledge-link]:hover {
+                color: #1d4ed8;
+                text-decoration: underline;
+              }
               .knowledge-content ul,
               .knowledge-content ol {
                 padding-left: 1.5em;
@@ -125,8 +216,10 @@ export function KnowledgeItemViewer({
               .knowledge-content em {
                 font-style: italic;
               }
-            `}</style>
-          </div>
+              `}</style>
+            </div>
+          </MobileViewContainer>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

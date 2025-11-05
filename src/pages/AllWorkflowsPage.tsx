@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { Button } from '../components/ui/button';
 import { ListTodo } from 'lucide-react';
+import { MobileViewHeader } from '../components/ui/MobileViewHeader';
+import { MobileViewContainer } from '../components/ui/MobileViewContainer';
 
 export function AllWorkflowsPage() {
   const { projects, getCompletedTaskIds } = useProjects();
@@ -30,10 +32,11 @@ export function AllWorkflowsPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Workflows</h1>
+      {/* Header matching dialog style - full width */}
+      <MobileViewHeader title="Workflows" />
+      <MobileViewContainer className="mb-6">
         <p className="text-slate-600">Select a workflow to view and check tasks</p>
-      </div>
+      </MobileViewContainer>
 
       {allWorkflows.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center border border-slate-200 rounded-lg bg-slate-50">
