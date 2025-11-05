@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
-import { Button } from '../components/ui/button';
 import { ListTodo } from 'lucide-react';
 import { MobileViewHeader } from '../components/ui/MobileViewHeader';
 import { MobileViewContainer } from '../components/ui/MobileViewContainer';
@@ -36,12 +35,12 @@ export function AllWorkflowsPage() {
       <MobileViewHeader title="Workflows" />
       
       {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4">
+      <div className="flex-1 overflow-y-auto min-h-0 py-4">
         <MobileViewContainer>
-          <p className="text-slate-600 mb-6">Select a workflow to view and check tasks</p>
+          <p className="text-slate-600 mb-6 px-4">Select a workflow to view and check tasks</p>
 
           {allWorkflows.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center border border-slate-200 rounded-lg bg-slate-50">
+            <div className="flex flex-col items-center justify-center py-16 text-center border border-slate-200 rounded-lg bg-slate-50 mx-4">
               <ListTodo className="h-16 w-16 text-slate-300 mb-4" />
               <h3 className="text-lg font-semibold text-slate-900 mb-2">
                 No workflows yet
@@ -51,22 +50,25 @@ export function AllWorkflowsPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4 mb-6">
+            <div className="[&>div:last-child]:border-b-0">
               {allWorkflows.map((workflow) => (
                 <div
                   key={workflow.id}
-                  className="border border-slate-200 rounded-lg p-5 bg-white hover:shadow-md transition-shadow"
+                  className="py-4 px-4 border-b border-slate-200 bg-white cursor-pointer transition-colors hover:bg-slate-50"
+                  onClick={() => navigate(`/${workflow.id}`)}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
                       <div className="text-sm text-slate-500 mb-1">{workflow.projectTitle}</div>
-                      <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">
                         {workflow.title}
                       </h3>
-                      <p className="text-slate-600 mb-3">{workflow.description}</p>
+                      {workflow.description && (
+                        <p className="text-slate-600 mb-3 line-clamp-2">{workflow.description}</p>
+                      )}
                       
                       {/* Progress Bar */}
-                      <div className="mb-2">
+                      <div>
                         <div className="flex items-center justify-between text-sm mb-1">
                           <span className="text-slate-600">
                             {workflow.completedTasks} of {workflow.totalTasks} tasks completed
@@ -82,16 +84,6 @@ export function AllWorkflowsPage() {
                           />
                         </div>
                       </div>
-                    </div>
-                    <div className="flex gap-2 ml-4">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => navigate(`/${workflow.id}`)}
-                        className="flex items-center gap-2"
-                      >
-                        Open
-                      </Button>
                     </div>
                   </div>
                 </div>

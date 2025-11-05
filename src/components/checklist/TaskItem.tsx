@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react';
 import { Task, TaskImportance } from '../../types';
-import { Trash2, Check, X, Upload, Flag, RotateCcw } from 'lucide-react';
+import { Check, X, Upload, Flag, RotateCcw } from 'lucide-react';
 import { Dialog, DialogContent } from '../ui/dialog';
 
 interface TaskItemProps {
   task: Task;
   onEdit: () => void;
-  onDelete: () => void;
-  onComplete: () => void;
+  onDelete?: () => void;
+  onComplete?: () => void;
   onImageUpdate?: (imageUrl: string | null) => void;
   onImportanceChange?: (importance: TaskImportance) => void;
   isDragging?: boolean;
@@ -23,8 +23,8 @@ interface TaskItemProps {
 export function TaskItem({
   task,
   onEdit,
-  onDelete,
-  onComplete,
+  onDelete: _onDelete,
+  onComplete: _onComplete,
   onImageUpdate,
   onImportanceChange,
   isDragging,
@@ -81,13 +81,12 @@ export function TaskItem({
   const getContainerClasses = () => {
     if (mode === 'view') {
       // Flat list style with dividers and horizontal padding for all screen sizes
-      // Check if buttons will be shown to adjust bottom padding
-      const hasButtons = (!completed && currentStepTaskId === task.id) || 
-                         (completed && lastCompletedTaskId === task.id && onUndo);
+      // Check if undo button will be shown to adjust bottom padding
+      const hasUndoButton = completed && lastCompletedTaskId === task.id && onUndo;
       // Check if this is the active step (current incomplete step)
       const isActiveStep = !completed && currentStepTaskId === task.id;
       // Use pt-4 for top padding, adjust bottom padding to match spacing
-      // When buttons are present, they add mt-1 spacing, so we need more padding to match
+      // When undo button is present, it adds mt-1 spacing, so we need more padding to match
       // Base background: white for incomplete, transparent for completed
       // Active steps have left green border and bottom divider, others just have bottom border
       const borderClasses = isActiveStep 
@@ -95,16 +94,20 @@ export function TaskItem({
         : 'border-b border-slate-200';
       // Background: high importance gets amber, completed high importance gets subtle darker, completed others get transparent, others get white
       let backgroundClass = 'bg-white';
+      let hoverClass = 'hover:bg-slate-50';
       if (completed) {
         if (importance === 'high') {
           backgroundClass = 'bg-slate-100';
+          hoverClass = 'hover:bg-slate-200';
         } else {
           backgroundClass = 'bg-transparent';
+          hoverClass = 'hover:bg-slate-50';
         }
       } else if (importance === 'high') {
         backgroundClass = 'bg-amber-50';
+        hoverClass = 'hover:bg-amber-100';
       }
-      const baseClasses = `pt-4 ${hasButtons ? 'pb-3' : 'pb-4'} px-4 ${borderClasses} ${backgroundClass}`;
+      const baseClasses = `pt-4 ${hasUndoButton ? 'pb-3' : 'pb-4'} px-4 ${borderClasses} ${backgroundClass} cursor-pointer transition-colors ${hoverClass}`;
       return baseClasses;
     } else {
       // Edit mode: card style
@@ -187,7 +190,6 @@ export function TaskItem({
           transition-all
           ${getContainerClasses()}
           ${isDragging ? 'opacity-50' : ''}
-          ${mode === 'view' ? 'cursor-pointer' : ''}
         `}
       >
         {/* Layout: Column with buttons on new line for all screen sizes */}
@@ -277,7 +279,9 @@ export function TaskItem({
                     </h3>
                     {/* Show completion check inline at end of title in view mode */}
                     {mode === 'view' && completed && (
-                      <Check className={`${styles.checkSize} text-green-600 flex-shrink-0`} title="Task completed" />
+                      <span title="Task completed">
+                        <Check className={`${styles.checkSize} text-green-600 flex-shrink-0`} />
+                      </span>
                     )}
                     {/* Show "Completed" text after title on larger screens */}
                     {mode === 'view' && completed && (
@@ -328,38 +332,20 @@ export function TaskItem({
           </div>
 
           {/* Actions - New line below content for all screen sizes */}
-          {mode === 'view' && (
-            <>
-              {!completed && currentStepTaskId === task.id && (
-                <div className="flex flex-col gap-2 mt-1">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onComplete();
-                    }}
-                    className="text-white bg-green-600 hover:bg-green-700 cursor-pointer transition-colors px-3 py-1.5 text-sm font-medium rounded-md w-full"
-                    title="Complete this step"
-                  >
-                    Complete Step
-                  </button>
-                </div>
-              )}
-              {completed && lastCompletedTaskId === task.id && onUndo && (
-                <div className="flex flex-col gap-2 mt-1">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onUndo();
-                    }}
-                    className="text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer transition-colors px-3 py-1.5 text-xs font-medium rounded-md flex items-center justify-center gap-1.5 w-full"
-                    title="Uncheck this step"
-                  >
-                    <RotateCcw className="w-3 h-3 flex-shrink-0" />
-                    Uncheck
-                  </button>
-                </div>
-              )}
-            </>
+          {mode === 'view' && completed && lastCompletedTaskId === task.id && onUndo && (
+            <div className="flex flex-col gap-2 mt-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUndo();
+                }}
+                className="text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer transition-colors px-3 py-1.5 text-xs font-medium rounded-md flex items-center justify-center gap-1.5 w-full"
+                title="Uncheck this step"
+              >
+                <RotateCcw className="w-3 h-3 flex-shrink-0" />
+                Uncheck
+              </button>
+            </div>
           )}
         </div>
       </div>

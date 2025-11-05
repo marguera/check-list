@@ -187,14 +187,6 @@ export function TaskList({
     }
   };
 
-  // Helper function to check if a task is completed
-  const isTaskCompletedCheck = (task: Task): boolean => {
-    if (mode !== 'view' || !workflowId || !workflowVersion || !isTaskCompleted) {
-      return false;
-    }
-    return isTaskCompleted(workflowId, workflowVersion, task.id);
-  };
-
   return (
     <DndContext
       sensors={sensors}

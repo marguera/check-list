@@ -8,7 +8,6 @@ import { MobileViewContainer } from '../ui/MobileViewContainer';
 import { WorkflowDialog } from './WorkflowDialog';
 import { TaskList } from '../checklist/TaskList';
 import { TaskDialog } from '../dialogs/TaskDialog';
-import { TaskCompletionDialog } from '../checklist/TaskCompletionDialog';
 
 interface WorkflowViewProps {
   project: Project;
@@ -55,7 +54,6 @@ export function WorkflowView({
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [localSelectedWorkflow] = useState<Project['workflows'][0] | null>(null);
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
-  const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [taskDialogMode, setTaskDialogMode] = useState<'add' | 'edit' | 'view'>('add');
   const [insertIndex, setInsertIndex] = useState<number | null>(null);
@@ -202,18 +200,12 @@ export function WorkflowView({
     onUpdateWorkflow(project.id, actualSelectedWorkflow.id, { tasks: updatedWorkflow.tasks });
   };
 
-  const handleCompleteTask = (task: Task) => {
-    setCurrentTask(task);
-    setCompletionDialogOpen(true);
-  };
-
-  const handleConfirmCompletion = () => {
+  const handleCompleteTask = () => {
     if (currentTask && actualSelectedWorkflow && completeTaskInExecution && getOrCreateWorkflowExecution) {
       const workflowVersion = actualSelectedWorkflow.version || 1;
       const execution = getOrCreateWorkflowExecution(actualSelectedWorkflow.id, workflowVersion);
       completeTaskInExecution(execution.id, currentTask.id);
     }
-    setCompletionDialogOpen(false);
   };
 
   const handleReorderTasks = (taskIds: string[]) => {
@@ -444,13 +436,11 @@ export function WorkflowView({
           knowledgeItems={knowledgeItems}
           onSave={handleSaveTask}
           mode={taskDialogMode}
-        />
-
-        <TaskCompletionDialog
-          open={completionDialogOpen}
-          onOpenChange={setCompletionDialogOpen}
-          task={currentTask}
-          onConfirm={handleConfirmCompletion}
+          isCurrentStep={readOnly && currentTask ? currentStepTaskId === currentTask.id : false}
+          isCompleted={readOnly && currentTask && actualSelectedWorkflow.version && isTaskCompleted
+            ? isTaskCompleted(actualSelectedWorkflow.id, actualSelectedWorkflow.version, currentTask.id)
+            : false}
+          onComplete={handleCompleteTask}
         />
       </div>
     );
@@ -458,20 +448,20 @@ export function WorkflowView({
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            {!readOnly ? `Project: ${project.title}` : project.title}
-          </h1>
-          <p className="text-slate-600">{project.description}</p>
-        </div>
-        {!readOnly && (
+      {!readOnly && (
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              Project: {project.title}
+            </h1>
+            <p className="text-slate-600">{project.description}</p>
+          </div>
           <Button onClick={handleAdd} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Add Workflow
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {project.workflows.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center border border-slate-200 rounded-lg bg-slate-50">
@@ -490,61 +480,59 @@ export function WorkflowView({
           )}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className={readOnly ? "[&>div:last-child]:border-b-0" : "space-y-4"}>
           {project.workflows.map((workflow) => (
             <div
               key={workflow.id}
-              className="border border-slate-200 rounded-lg p-5 bg-white hover:shadow-md transition-shadow"
+              className={readOnly 
+                ? "py-4 px-4 border-b border-slate-200 bg-white cursor-pointer transition-colors hover:bg-slate-50"
+                : "border border-slate-200 rounded-lg p-5 bg-white hover:shadow-md transition-shadow"
+              }
+              onClick={readOnly ? () => navigate(`/${workflow.id}`) : undefined}
             >
               <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className={`${readOnly ? 'text-lg' : 'text-xl'} font-semibold text-slate-900 mb-2`}>
                     {workflow.title}
                   </h3>
-                  <p className="text-slate-600 mb-3">{workflow.description}</p>
+                  {workflow.description && (
+                    <p className={`text-slate-600 mb-3 ${readOnly ? 'line-clamp-2' : ''}`}>{workflow.description}</p>
+                  )}
                   <div className="text-sm text-slate-500">
                     {workflow.tasks.length} task{workflow.tasks.length !== 1 ? 's' : ''}
                   </div>
                 </div>
-                <div className="flex gap-2 ml-4">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => {
-                      if (readOnly) {
-                        navigate(`/${workflow.id}`);
-                      } else {
-                        navigate(`/projects/${project.id}/workflows/${workflow.id}`);
-                      }
-                    }}
-                    className="flex items-center gap-2"
-                  >
-                    Open Workflow
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                  {!readOnly && (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(workflow)}
-                        className="flex items-center gap-2"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => onDeleteWorkflow(project.id, workflow.id)}
-                        className="flex items-center gap-2"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Delete
-                      </Button>
-                    </>
-                  )}
-                </div>
+                {!readOnly && (
+                  <div className="flex gap-2 ml-4">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => navigate(`/projects/${project.id}/workflows/${workflow.id}`)}
+                      className="flex items-center gap-2"
+                    >
+                      Open Workflow
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(workflow)}
+                      className="flex items-center gap-2"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => onDeleteWorkflow(project.id, workflow.id)}
+                      className="flex items-center gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
