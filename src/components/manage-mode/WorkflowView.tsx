@@ -6,6 +6,7 @@ import { Plus, Edit, Trash2, ListTodo, ArrowRight } from 'lucide-react';
 import { WorkflowDialog } from './workflow/WorkflowDialog';
 import { ManageTaskList } from './TaskList';
 import { ManageTaskDialog } from './TaskDialog';
+import { PreviewDialog } from './PreviewDialog';
 
 interface ManageWorkflowViewProps {
   project: Project;
@@ -41,7 +42,7 @@ export function ManageWorkflowView({
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [taskDialogMode, setTaskDialogMode] = useState<'add' | 'edit'>('add');
   const [insertIndex, setInsertIndex] = useState<number | null>(null);
-  const [listMode, setListMode] = useState<'edit' | 'view'>('edit');
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   
   const actualSelectedWorkflow = selectedWorkflowProp || localSelectedWorkflow;
   
@@ -195,15 +196,7 @@ export function ManageWorkflowView({
 
         <div className="flex gap-2 mb-6">
           <Button
-            variant={listMode === 'edit' ? 'default' : 'outline'}
-            onClick={() => setListMode('edit')}
-            size="sm"
-          >
-            Edit
-          </Button>
-          <Button
-            variant={listMode === 'view' ? 'default' : 'outline'}
-            onClick={() => setListMode('view')}
+            onClick={() => setPreviewDialogOpen(true)}
             size="sm"
           >
             Preview
@@ -218,7 +211,6 @@ export function ManageWorkflowView({
           onTaskImportanceChange={handleTaskImportanceChange}
           onReorderTasks={handleReorderTasks}
           onInsertTask={handleInsertTask}
-          previewMode={listMode === 'view'}
         />
 
         <ManageTaskDialog
@@ -234,6 +226,13 @@ export function ManageWorkflowView({
           knowledgeItems={knowledgeItems}
           onSave={handleSaveTask}
           mode={taskDialogMode}
+        />
+
+        <PreviewDialog
+          open={previewDialogOpen}
+          onOpenChange={setPreviewDialogOpen}
+          workflow={actualSelectedWorkflow}
+          knowledgeItems={knowledgeItems}
         />
       </div>
     );
