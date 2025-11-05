@@ -1,5 +1,5 @@
-import { useProjects } from '../hooks/useProjects';
-import { KnowledgeBaseView } from '../components/manage-mode/knowledge/KnowledgeBaseView';
+import { useProjects } from '../../hooks/useProjects';
+import { KnowledgeBaseView } from '../../components/manage-mode/knowledge/KnowledgeBaseView';
 
 export function KnowledgeBasePage() {
   const {

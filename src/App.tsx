@@ -3,12 +3,12 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ModeHeader } from './components/navigation/ModeHeader';
 import { AppHeader } from './components/manage-mode/navigation/AppHeader';
 import { Breadcrumbs } from './components/manage-mode/navigation/Breadcrumbs';
-import { ProjectsPage } from './pages/ProjectsPage';
-import { ProjectWorkflowsPage } from './pages/ProjectWorkflowsPage';
-import { WorkflowTasksPage } from './pages/WorkflowTasksPage';
-import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
-import { AllWorkflowsPage } from './pages/AllWorkflowsPage';
-import { ViewWorkflowTasksPage } from './pages/ViewWorkflowTasksPage';
+import { ProjectsPage } from './pages/manage-mode/ProjectsPage';
+import { ProjectWorkflowsPage } from './pages/manage-mode/ProjectWorkflowsPage';
+import { WorkflowTasksPage } from './pages/manage-mode/WorkflowTasksPage';
+import { KnowledgeBasePage } from './pages/manage-mode/KnowledgeBasePage';
+import { AllWorkflowsPage } from './pages/view-mode/AllWorkflowsPage';
+import { ViewWorkflowTasksPage } from './pages/view-mode/ViewWorkflowTasksPage';
 import { useBreadcrumbs } from './hooks/useBreadcrumbs';
 
 function AppLayout({ children }: { children: ReactNode }) {

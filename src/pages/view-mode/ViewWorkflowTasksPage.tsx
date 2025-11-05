@@ -1,7 +1,7 @@
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
-import { useProjects } from '../hooks/useProjects';
-import { ViewWorkflowView } from '../components/view-mode/WorkflowView';
-import { Project } from '../types';
+import { useProjects } from '../../hooks/useProjects';
+import { ViewWorkflowView } from '../../components/view-mode/WorkflowView';
+import { Project } from '../../types';
 
 export function ViewWorkflowTasksPage() {
   const { workflowId } = useParams<{ workflowId: string }>();

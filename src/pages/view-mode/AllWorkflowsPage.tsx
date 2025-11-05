@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useProjects } from '../hooks/useProjects';
+import { useProjects } from '../../hooks/useProjects';
 import { ListTodo } from 'lucide-react';
-import { MobileViewHeader } from '../components/ui/MobileViewHeader';
-import { MobileViewContainer } from '../components/ui/MobileViewContainer';
+import { MobileViewHeader } from '../../components/ui/MobileViewHeader';
+import { MobileViewContainer } from '../../components/ui/MobileViewContainer';
 
 export function AllWorkflowsPage() {
   const { projects, getCompletedTaskIds } = useProjects();
