@@ -134,10 +134,22 @@ export function ViewTaskItem({
       >
         <div className="flex flex-col">
           {/* Step Number */}
-          <div className={`font-semibold text-xs sm:text-sm mb-1 ${
+          <div className={`flex items-center gap-2 flex-wrap font-semibold text-xs sm:text-sm mb-1 ${
             completed ? 'text-white/40' : 'text-white/60'
           }`}>
-            STEP {task.stepNumber}
+            <span>STEP {task.stepNumber}</span>
+            {/* Show completion check */}
+            {completed && (
+              <span className="inline-flex items-center flex-shrink-0 align-middle" title="Task completed">
+                <Check className="w-4 h-4 text-green-400" />
+              </span>
+            )}
+            {/* Show current badge for active step */}
+            {isActiveStep && (
+              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium flex-shrink-0 bg-green-500/20 text-green-400">
+                CURRENT
+              </span>
+            )}
           </div>
           
           {/* Main content row (image + content) */}
@@ -169,19 +181,6 @@ export function ViewTaskItem({
                     } break-words`}>
                       {task.title}
                     </h3>
-                    {/* Show completion check and text */}
-                    {completed && (
-                      <span className="inline-flex items-center gap-1 flex-shrink-0 align-middle" title="Task completed">
-                        <Check className="w-4 h-4 text-green-400" />
-                        <span className="text-xs font-medium text-green-400 uppercase">COMPLETED</span>
-                      </span>
-                    )}
-                    {/* Show current badge for active step */}
-                    {isActiveStep && (
-                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium flex-shrink-0 bg-green-500/20 text-green-400">
-                        CURRENT
-                      </span>
-                    )}
                   </div>
                   {task.description && (
                     <p className={`${styles.description} line-clamp-2 ${
