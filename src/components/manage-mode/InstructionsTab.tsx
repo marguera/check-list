@@ -1,7 +1,7 @@
-import { TipTapEditor } from '../editor/TipTapEditor';
+import { TipTapEditor } from './editor/TipTapEditor';
 import { KnowledgeItem } from '../../types';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
-import { ImageViewerDialog } from './ImageViewerDialog';
+import { ImageViewerDialog } from '../dialogs/ImageViewerDialog';
 import { useState, useEffect, useRef } from 'react';
 import { isInstructionsEmpty } from '../../utils/instructions';
 
@@ -265,5 +265,4 @@ export function InstructionsTab({
     </div>
   );
 }
-
 

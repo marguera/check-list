@@ -1,6 +1,6 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
-import { WorkflowView } from '../components/workflow/WorkflowView';
+import { ManageWorkflowView } from '../components/manage-mode/WorkflowView';
 
 export function WorkflowTasksPage() {
   const { projectId, workflowId } = useParams<{ projectId: string; workflowId: string }>();
@@ -21,7 +21,7 @@ export function WorkflowTasksPage() {
   }
 
   return (
-    <WorkflowView
+    <ManageWorkflowView
       project={project}
       onBack={() => {}}
       onUpdateProject={() => {}}

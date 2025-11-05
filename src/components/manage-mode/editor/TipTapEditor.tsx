@@ -3,8 +3,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import { ImageExtension } from './ImageExtension';
 import KnowledgeDatabaseLink from './KnowledgeDatabaseLinkTool';
-import { KnowledgeItem } from '../../types';
-import { Button } from '../ui/button';
+import { KnowledgeItem } from '../../../types';
+import { Button } from '../../ui/button';
 import {
   Bold,
   Italic,
@@ -528,3 +528,4 @@ export function TipTapEditor({
     </div>
   );
 }
+

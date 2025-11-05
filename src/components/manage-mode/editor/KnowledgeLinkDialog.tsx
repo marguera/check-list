@@ -6,9 +6,9 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '../ui/dialog';
-import { Button } from '../ui/button';
-import { KnowledgeItem } from '../../types';
+} from '../../ui/dialog';
+import { Button } from '../../ui/button';
+import { KnowledgeItem } from '../../../types';
 
 interface KnowledgeLinkDialogProps {
   open: boolean;
@@ -80,5 +80,4 @@ export function KnowledgeLinkDialog({
     </Dialog>
   );
 }
-
 

@@ -1,5 +1,5 @@
 import { Mark, mergeAttributes } from '@tiptap/core';
-import { KnowledgeItem } from '../../types';
+import { KnowledgeItem } from '../../../types';
 
 export interface KnowledgeDatabaseLinkOptions {
   knowledgeItems: KnowledgeItem[];
@@ -110,5 +110,4 @@ const KnowledgeDatabaseLink = Mark.create<KnowledgeDatabaseLinkOptions>({
 });
 
 export default KnowledgeDatabaseLink;
-
 

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { KnowledgeItem } from '../../types';
-import { Button } from '../ui/button';
+import { KnowledgeItem } from '../../../types';
+import { Button } from '../../ui/button';
 import { Plus, Edit, Trash2, BookOpen } from 'lucide-react';
 import { KnowledgeItemDialog } from './KnowledgeItemDialog';
-import { KnowledgeItemViewer } from './KnowledgeItemViewer';
+import { KnowledgeItemViewer } from '../../knowledge/KnowledgeItemViewer';
 
 interface KnowledgeBaseViewProps {
   knowledgeItems: KnowledgeItem[];

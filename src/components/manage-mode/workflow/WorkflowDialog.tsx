@@ -1,37 +1,37 @@
 import { useState, useEffect } from 'react';
-import { Project } from '../../types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
-import { Button } from '../ui/button';
+import { Project } from '../../../types';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
+import { Button } from '../../ui/button';
 
-interface ProjectDialogProps {
+interface WorkflowDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  project: Project | null;
-  onSave: (project: Partial<Project>) => void;
+  workflow: Project['workflows'][0] | null;
+  onSave: (workflow: Partial<Project['workflows'][0]>) => void;
   mode: 'add' | 'edit';
 }
 
-export function ProjectDialog({
+export function WorkflowDialog({
   open,
   onOpenChange,
-  project,
+  workflow,
   onSave,
   mode,
-}: ProjectDialogProps) {
+}: WorkflowDialogProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
   useEffect(() => {
     if (open) {
-      if (project) {
-        setTitle(project.title);
-        setDescription(project.description);
+      if (workflow) {
+        setTitle(workflow.title);
+        setDescription(workflow.description);
       } else {
         setTitle('');
         setDescription('');
       }
     }
-  }, [open, project]);
+  }, [open, workflow]);
 
   const handleSave = () => {
     if (!title.trim()) {
@@ -45,10 +45,10 @@ export function ProjectDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'add' ? 'Add Project' : 'Edit Project'}
+            {mode === 'add' ? 'Add Workflow' : 'Edit Workflow'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'add' ? 'Create a new project to organize your workflows' : 'Edit the project details'}
+            {mode === 'add' ? 'Create a new workflow for your project' : 'Edit the workflow details'}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -61,7 +61,7 @@ export function ProjectDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
-              placeholder="Enter project title"
+              placeholder="Enter workflow title"
             />
           </div>
           <div>
@@ -73,7 +73,7 @@ export function ProjectDialog({
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 resize-none"
-              placeholder="Enter project description"
+              placeholder="Enter workflow description"
             />
           </div>
         </div>

@@ -4,20 +4,17 @@ import { extractKnowledgeLinkIds } from '../../utils/knowledgeLinks';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
 import { useState } from 'react';
 
-interface KnowledgeDatabaseTabProps {
+interface ManageKnowledgeDatabaseTabProps {
   linkedItemIds: string[];
   knowledgeItems: KnowledgeItem[];
   instructions?: string;
-  mode?: 'view' | 'edit' | 'completion';
 }
 
-export function KnowledgeDatabaseTab({
+export function ManageKnowledgeDatabaseTab({
   linkedItemIds,
   knowledgeItems,
   instructions,
-  mode = 'edit',
-}: KnowledgeDatabaseTabProps) {
-  const isViewMode = mode === 'view' || mode === 'completion';
+}: ManageKnowledgeDatabaseTabProps) {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewingItem, setViewingItem] = useState<KnowledgeItem | null>(null);
 
@@ -40,8 +37,8 @@ export function KnowledgeDatabaseTab({
   if (linkedItems.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <BookOpen className={`h-12 w-12 mb-4 ${isViewMode ? 'text-white/30' : 'text-slate-300'}`} />
-        <p className={isViewMode ? 'text-white/60' : 'text-slate-500'}>No knowledge items linked in instructions</p>
+        <BookOpen className="h-12 w-12 mb-4 text-slate-300" />
+        <p className="text-slate-500">No knowledge items linked in instructions</p>
       </div>
     );
   }
@@ -49,29 +46,21 @@ export function KnowledgeDatabaseTab({
   return (
     <>
       <div className="space-y-4">
-        <div className={`text-sm mb-4 ${isViewMode ? 'text-white/70' : 'text-slate-600'}`}>
+        <div className="text-sm mb-4 text-slate-600">
           {linkedItems.length} knowledge item{linkedItems.length !== 1 ? 's' : ''} referenced in instructions
         </div>
         <div className="space-y-3">
           {linkedItems.map((item) => (
             <div
               key={item.id}
-              className={`border p-4 transition-colors cursor-pointer ${
-                isViewMode 
-                  ? 'border-white/20 hover:bg-white/10' 
-                  : 'border-slate-200 rounded-lg hover:bg-slate-50'
-              }`}
+              className="border border-slate-200 rounded-lg hover:bg-slate-50 p-4 transition-colors cursor-pointer"
               onClick={() => handleView(item)}
             >
-              <h3 className={`font-semibold mb-2 transition-colors ${
-                isViewMode 
-                  ? 'text-white hover:text-blue-400' 
-                  : 'text-slate-900 hover:text-blue-600'
-              }`}>
+              <h3 className="font-semibold mb-2 transition-colors text-slate-900 hover:text-blue-600">
                 {item.title}
               </h3>
               {item.description && (
-                <p className={`text-sm ${isViewMode ? 'text-white/70' : 'text-slate-600'}`}>{item.description}</p>
+                <p className="text-sm text-slate-600">{item.description}</p>
               )}
             </div>
           ))}

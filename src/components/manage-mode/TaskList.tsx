@@ -17,38 +17,23 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Plus } from 'lucide-react';
 import { Task, TaskImportance } from '../../types';
-import { TaskItem } from './TaskItem';
+import { ManageTaskItem } from './TaskItem';
+import { ViewTaskList as ViewModeTaskList } from '../view-mode/TaskList';
 
 interface SortableTaskItemProps {
   task: Task;
   onEdit: () => void;
   onDelete: () => void;
-  onComplete: () => void;
   onImageUpdate?: (imageUrl: string | null) => void;
   onImportanceChange?: (importance: TaskImportance) => void;
-  mode: 'edit' | 'view';
-  workflowId?: string;
-  workflowVersion?: number;
-  isTaskCompleted?: (workflowId: string, workflowVersion: number, taskId: string) => boolean;
-  currentStepTaskId?: string | null;
-  lastCompletedTaskId?: string | null;
-  onUndo?: () => void;
 }
 
 function SortableTaskItem({
   task,
   onEdit,
   onDelete,
-  onComplete,
   onImageUpdate,
   onImportanceChange,
-  mode,
-  workflowId,
-  workflowVersion,
-  isTaskCompleted,
-  currentStepTaskId,
-  lastCompletedTaskId,
-  onUndo,
 }: SortableTaskItemProps) {
   const {
     attributes,
@@ -64,13 +49,10 @@ function SortableTaskItem({
     transition,
   };
 
-  // Filter listeners to exclude clicks on buttons and other interactive elements
-  // Also disable drag in view mode
-  const filteredListeners = mode === 'view' ? {} : {
+  const filteredListeners = {
     ...listeners,
-    onPointerDown: (e: PointerEvent) => {
+    onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
       const target = e.target as HTMLElement;
-      // Don't activate drag if clicking on a button, link, or any interactive element
       if (
         target.tagName === 'BUTTON' ||
         target.tagName === 'A' ||
@@ -79,7 +61,9 @@ function SortableTaskItem({
       ) {
         return;
       }
-      listeners?.onPointerDown?.(e);
+      if (listeners?.onPointerDown) {
+        listeners.onPointerDown(e);
+      }
     },
   };
 
@@ -88,23 +72,15 @@ function SortableTaskItem({
       <div
         {...attributes}
         {...filteredListeners}
-        className={mode === 'view' ? '' : 'cursor-move'}
+        className="cursor-move"
       >
-        <TaskItem
+        <ManageTaskItem
           task={task}
           onEdit={onEdit}
           onDelete={onDelete}
-          onComplete={onComplete}
           onImageUpdate={onImageUpdate}
           onImportanceChange={onImportanceChange}
           isDragging={isDragging}
-          mode={mode}
-          workflowId={workflowId}
-          workflowVersion={workflowVersion}
-          isTaskCompleted={isTaskCompleted}
-          currentStepTaskId={currentStepTaskId}
-          lastCompletedTaskId={lastCompletedTaskId}
-          onUndo={onUndo}
         />
       </div>
     </div>
@@ -130,41 +106,27 @@ function AddTaskButton({ onClick }: AddTaskButtonProps) {
   );
 }
 
-interface TaskListProps {
+interface ManageTaskListProps {
   tasks: Task[];
   onTaskEdit: (task: Task) => void;
   onTaskDelete: (taskId: string) => void;
-  onTaskComplete: (task: Task) => void;
   onTaskImageUpdate?: (taskId: string, imageUrl: string | null) => void;
   onTaskImportanceChange?: (taskId: string, importance: TaskImportance) => void;
   onReorderTasks: (taskIds: string[]) => void;
   onInsertTask: (index: number) => void;
-  mode: 'edit' | 'view';
-  workflowId?: string;
-  workflowVersion?: number;
-  isTaskCompleted?: (workflowId: string, workflowVersion: number, taskId: string) => boolean;
-  currentStepTaskId?: string | null;
-  lastCompletedTaskId?: string | null;
-  onUndo?: () => void;
+  previewMode?: boolean; // When true, use view-mode styling but keep manage functionality
 }
 
-export function TaskList({
+export function ManageTaskList({
   tasks,
   onTaskEdit,
   onTaskDelete,
-  onTaskComplete,
   onTaskImageUpdate,
   onTaskImportanceChange,
   onReorderTasks,
   onInsertTask,
-  mode,
-  workflowId,
-  workflowVersion,
-  isTaskCompleted,
-  currentStepTaskId,
-  lastCompletedTaskId,
-  onUndo,
-}: TaskListProps) {
+  previewMode = false,
+}: ManageTaskListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -187,6 +149,16 @@ export function TaskList({
     }
   };
 
+  // If in preview mode, use view-mode components (view styling but no completion tracking)
+  if (previewMode) {
+    return (
+      <ViewModeTaskList
+        tasks={tasks}
+        onTaskEdit={onTaskEdit}
+      />
+    );
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -197,26 +169,18 @@ export function TaskList({
         items={tasks.map((task) => task.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className={mode === 'view' ? '[&>div:last-child>div>div[data-task-id]]:border-b-0' : ''}>
-          {mode === 'edit' && <AddTaskButton onClick={() => onInsertTask(0)} />}
+        <div>
+          <AddTaskButton onClick={() => onInsertTask(0)} />
           {tasks.map((task, index) => (
             <div key={task.id}>
               <SortableTaskItem
-                  task={task}
-                  onEdit={() => onTaskEdit(task)}
-                  onDelete={() => onTaskDelete(task.id)}
-                  onComplete={() => onTaskComplete(task)}
-                  onImageUpdate={onTaskImageUpdate ? (imageUrl) => onTaskImageUpdate(task.id, imageUrl) : undefined}
-                  onImportanceChange={onTaskImportanceChange ? (importance) => onTaskImportanceChange(task.id, importance) : undefined}
-                  mode={mode}
-                  workflowId={workflowId}
-                  workflowVersion={workflowVersion}
-                  isTaskCompleted={isTaskCompleted}
-                  currentStepTaskId={currentStepTaskId}
-                  lastCompletedTaskId={lastCompletedTaskId}
-                  onUndo={onUndo}
-                />
-              {mode === 'edit' && <AddTaskButton onClick={() => onInsertTask(index + 1)} />}
+                task={task}
+                onEdit={() => onTaskEdit(task)}
+                onDelete={() => onTaskDelete(task.id)}
+                onImageUpdate={onTaskImageUpdate ? (imageUrl) => onTaskImageUpdate(task.id, imageUrl) : undefined}
+                onImportanceChange={onTaskImportanceChange ? (importance) => onTaskImportanceChange(task.id, importance) : undefined}
+              />
+              <AddTaskButton onClick={() => onInsertTask(index + 1)} />
             </div>
           ))}
         </div>
@@ -224,5 +188,4 @@ export function TaskList({
     </DndContext>
   );
 }
-
 

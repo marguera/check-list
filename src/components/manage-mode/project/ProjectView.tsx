@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Project } from '../../types';
-import { Button } from '../ui/button';
+import { Project } from '../../../types';
+import { Button } from '../../ui/button';
 import { Plus, Edit, Trash2, FolderOpen, ArrowRight } from 'lucide-react';
 import { ProjectDialog } from './ProjectDialog';
 

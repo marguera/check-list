@@ -10,7 +10,7 @@ import { Task, KnowledgeItem } from '../../types';
 import { useState, useEffect } from 'react';
 import { MobileViewHeader } from '../ui/MobileViewHeader';
 import { MobileViewContainer } from '../ui/MobileViewContainer';
-import { TaskDetailsContent } from '../dialogs/TaskDetailsContent';
+import { ViewTaskDetailsContent } from './TaskDetailsContent';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
 import { ImageViewerDialog } from '../dialogs/ImageViewerDialog';
 
@@ -68,10 +68,9 @@ export function TaskCompletionDialog({
           {/* Scrollable content area */}
           <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4">
             <MobileViewContainer>
-              <TaskDetailsContent
+              <ViewTaskDetailsContent
                 task={task}
                 knowledgeItems={knowledgeItems}
-                mode="completion"
                 onKnowledgeLinkClick={(item) => {
                   setViewingItem(item);
                   setViewerOpen(true);
@@ -141,5 +140,4 @@ export function TaskCompletionDialog({
     </Dialog>
   );
 }
-
 

@@ -1,6 +1,6 @@
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
-import { WorkflowView } from '../components/workflow/WorkflowView';
+import { ViewWorkflowView } from '../components/view-mode/WorkflowView';
 import { Project } from '../types';
 
 export function ViewWorkflowTasksPage() {
@@ -8,7 +8,6 @@ export function ViewWorkflowTasksPage() {
   const { 
     projects, 
     knowledgeItems, 
-    updateWorkflow,
     getOrCreateWorkflowExecution,
     completeTaskInExecution,
     isTaskCompleted,
@@ -39,20 +38,12 @@ export function ViewWorkflowTasksPage() {
   }
 
   return (
-    <WorkflowView
-      project={project}
-      onBack={() => {}}
-      onUpdateProject={() => {}}
-      onAddWorkflow={() => {}}
-      onUpdateWorkflow={(pId, wId, updates) => updateWorkflow(pId, wId, updates)}
-      onDeleteWorkflow={() => {}}
-      knowledgeItems={knowledgeItems}
+    <ViewWorkflowView
       selectedWorkflow={workflow}
-      onWorkflowSelect={() => {}}
+      knowledgeItems={knowledgeItems}
       onBackToWorkflows={() => {
         navigate('/');
       }}
-      readOnly={true}
       getOrCreateWorkflowExecution={getOrCreateWorkflowExecution}
       completeTaskInExecution={completeTaskInExecution}
       isTaskCompleted={isTaskCompleted}

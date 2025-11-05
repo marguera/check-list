@@ -1,5 +1,5 @@
 import { useProjects } from '../hooks/useProjects';
-import { ProjectView } from '../components/project/ProjectView';
+import { ProjectView } from '../components/manage-mode/project/ProjectView';
 
 export function ProjectsPage() {
   const {

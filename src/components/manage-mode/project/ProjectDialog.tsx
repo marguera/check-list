@@ -1,58 +1,54 @@
 import { useState, useEffect } from 'react';
-import { KnowledgeItem } from '../../types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { TipTapEditor } from '../editor/TipTapEditor';
+import { Project } from '../../../types';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
+import { Button } from '../../ui/button';
 
-interface KnowledgeItemDialogProps {
+interface ProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: KnowledgeItem | null;
-  onSave: (item: Partial<KnowledgeItem>) => void;
+  project: Project | null;
+  onSave: (project: Partial<Project>) => void;
   mode: 'add' | 'edit';
 }
 
-export function KnowledgeItemDialog({
+export function ProjectDialog({
   open,
   onOpenChange,
-  item,
+  project,
   onSave,
   mode,
-}: KnowledgeItemDialogProps) {
+}: ProjectDialogProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [content, setContent] = useState('');
 
   useEffect(() => {
     if (open) {
-      if (item) {
-        setTitle(item.title);
-        setDescription(item.description);
-        setContent(item.content);
+      if (project) {
+        setTitle(project.title);
+        setDescription(project.description);
       } else {
         setTitle('');
         setDescription('');
-        setContent('');
       }
     }
-  }, [open, item]);
+  }, [open, project]);
 
   const handleSave = () => {
     if (!title.trim()) {
       return;
     }
-    onSave({ title, description, content });
+    onSave({ title, description });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'add' ? 'Add Knowledge Item' : 'Edit Knowledge Item'}
+            {mode === 'add' ? 'Add Project' : 'Edit Project'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'add' ? 'Create a new knowledge item for your database' : 'Edit the knowledge item details'}
+            {mode === 'add' ? 'Create a new project to organize your workflows' : 'Edit the project details'}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -65,32 +61,19 @@ export function KnowledgeItemDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
-              placeholder="Enter knowledge item title"
+              placeholder="Enter project title"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Description
             </label>
-            <input
-              type="text"
+            <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
-              placeholder="Enter a brief description"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Content
-            </label>
-            <TipTapEditor
-              key={item?.id || 'new'}
-              content={content}
-              onChange={setContent}
-              knowledgeItems={[]}
-              editable={true}
-              showKnowledgeLinkButton={false}
+              rows={4}
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 resize-none"
+              placeholder="Enter project description"
             />
           </div>
         </div>

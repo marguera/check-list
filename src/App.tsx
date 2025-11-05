@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ModeHeader } from './components/navigation/ModeHeader';
-import { AppHeader } from './components/navigation/AppHeader';
-import { Breadcrumbs } from './components/navigation/Breadcrumbs';
+import { AppHeader } from './components/manage-mode/navigation/AppHeader';
+import { Breadcrumbs } from './components/manage-mode/navigation/Breadcrumbs';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { ProjectWorkflowsPage } from './pages/ProjectWorkflowsPage';
 import { WorkflowTasksPage } from './pages/WorkflowTasksPage';
