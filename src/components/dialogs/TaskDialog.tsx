@@ -1,14 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
   DialogFooter,
 } from '../ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
 import { Button } from '../ui/button';
-import { ArrowLeft } from 'lucide-react';
 import { MobileViewHeader } from '../ui/MobileViewHeader';
 import { MobileViewContainer } from '../ui/MobileViewContainer';
 import { InstructionsTab } from './InstructionsTab';

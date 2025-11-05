@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project, Task, TaskImportance } from '../../types';
 import { Button } from '../ui/button';
-import { Plus, Edit, Trash2, ListTodo, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Plus, Edit, Trash2, ListTodo, ArrowRight } from 'lucide-react';
 import { MobileViewHeader } from '../ui/MobileViewHeader';
 import { MobileViewContainer } from '../ui/MobileViewContainer';
 import { WorkflowDialog } from './WorkflowDialog';

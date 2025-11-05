@@ -2,6 +2,7 @@ import { NodeViewWrapper } from '@tiptap/react';
 import { NodeViewProps } from '@tiptap/react';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { AlignLeft, AlignCenter, AlignRight, ChevronDown } from 'lucide-react';
+import { NodeSelection } from 'prosemirror-state';
 
 // Standard image sizes
 const IMAGE_SIZES = {
@@ -84,7 +85,8 @@ export function ImageNodeView({ node, updateAttributes, selected, editor, getPos
       if (pos !== undefined) {
         const { view } = editor;
         const { state } = view;
-        const tr = state.tr.setSelection(state.selection.constructor.near(state.doc.resolve(pos)));
+        const nodeSelection = NodeSelection.near(state.doc.resolve(pos));
+        const tr = state.tr.setSelection(nodeSelection);
         view.dispatch(tr);
       }
     }
