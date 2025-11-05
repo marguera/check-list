@@ -82,9 +82,20 @@ export function KnowledgeItemViewer({
               .knowledge-content img {
                 max-width: 100%;
                 height: auto;
-                display: block;
-                margin: 1em auto;
                 border-radius: 0.5rem;
+                display: block;
+              }
+              .knowledge-content img:not([data-align]) {
+                margin: 1em auto;
+              }
+              .knowledge-content img[data-align="left"] {
+                margin: 1em 0;
+              }
+              .knowledge-content img[data-align="right"] {
+                margin-left: auto;
+                margin-right: 0;
+                margin-top: 1em;
+                margin-bottom: 1em;
               }
               .knowledge-content a {
                 color: #2563eb;

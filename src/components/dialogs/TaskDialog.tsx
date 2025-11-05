@@ -291,9 +291,20 @@ export function TaskDialog({
                     .instructions-content img {
                       max-width: 100%;
                       height: auto;
-                      display: block;
-                      margin: 1em auto;
                       border-radius: 0.5rem;
+                      display: block;
+                    }
+                    .instructions-content img:not([data-align]) {
+                      margin: 1em auto;
+                    }
+                    .instructions-content img[data-align="left"] {
+                      margin: 1em 0;
+                    }
+                    .instructions-content img[data-align="right"] {
+                      margin-left: auto;
+                      margin-right: 0;
+                      margin-top: 1em;
+                      margin-bottom: 1em;
                     }
                     .instructions-content a[data-knowledge-link] {
                       color: #2563eb;

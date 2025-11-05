@@ -1,7 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
+import { ImageExtension } from './ImageExtension';
 import KnowledgeDatabaseLink from './KnowledgeDatabaseLinkTool';
 import { KnowledgeItem } from '../../types';
 import { Button } from '../ui/button';
@@ -49,7 +49,7 @@ export function TipTapEditor({
           class: 'text-blue-600 underline',
         },
       }),
-      Image.configure({
+      ImageExtension.configure({
         inline: false,
         allowBase64: true,
         HTMLAttributes: {
@@ -426,13 +426,6 @@ export function TipTapEditor({
           margin: 0.25em 0;
           display: list-item;
         }
-        .ProseMirror img {
-          max-width: 100%;
-          height: auto;
-          display: block;
-          margin: 1em auto;
-          border-radius: 0.5rem;
-        }
         .ProseMirror a {
           color: #2563eb;
           text-decoration: underline;
@@ -445,6 +438,79 @@ export function TipTapEditor({
         }
         .ProseMirror em {
           font-style: italic;
+        }
+        /* Image node styles */
+        .ProseMirror .image-node-wrapper {
+          margin: 1em 0;
+          clear: both;
+        }
+        .ProseMirror .image-node-wrapper.text-left {
+          text-align: left;
+        }
+        .ProseMirror .image-node-wrapper.text-center {
+          text-align: center;
+        }
+        .ProseMirror .image-node-wrapper.text-right {
+          text-align: right;
+        }
+        .ProseMirror .image-node-wrapper.selected {
+          outline: none;
+        }
+        .ProseMirror .image-container {
+          position: relative;
+          display: inline-block;
+          max-width: 100%;
+        }
+        .ProseMirror .image-node {
+          max-width: 100%;
+          height: auto;
+          border-radius: 0.5rem;
+          user-select: none;
+        }
+        .ProseMirror .image-node.float-left {
+          float: left;
+          margin-right: 1em;
+          margin-bottom: 0.5em;
+          margin-top: 0.5em;
+        }
+        .ProseMirror .image-node.float-right {
+          float: right;
+          margin-left: 1em;
+          margin-bottom: 0.5em;
+          margin-top: 0.5em;
+        }
+        .ProseMirror .image-node.block {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        /* Text wrapping for paragraphs with images */
+        .ProseMirror p {
+          overflow: hidden;
+        }
+        .ProseMirror p::after {
+          content: "";
+          display: table;
+          clear: both;
+        }
+        /* Image toolbar */
+        .ProseMirror .image-toolbar {
+          transition: opacity 0.2s;
+        }
+        .ProseMirror .image-container:hover .image-toolbar,
+        .ProseMirror .image-container.show-controls .image-toolbar {
+          opacity: 1;
+        }
+        /* Alignment controls */
+        .ProseMirror .align-button {
+          transition: background-color 0.2s, color 0.2s;
+        }
+        .ProseMirror .align-button:hover {
+          background-color: #e5e7eb !important;
+        }
+        .ProseMirror .align-button.active {
+          background-color: #3b82f6 !important;
+          color: white !important;
         }
       `}</style>
     </div>
