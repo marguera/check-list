@@ -61,20 +61,29 @@ export function ViewTaskItem({
   // Build container classes - flat list style for view mode
   const getContainerClasses = () => {
     const hasUndoButton = completed && lastCompletedTaskId === task.id && onUndo;
-    const borderClasses = isActiveStep 
-      ? 'border-l-4 border-l-green-500 border-b border-white/20' 
-      : 'border-b border-white/20';
     
-    let backgroundClass = 'bg-transparent';
-    let hoverClass = 'hover:bg-white/5';
+    // All items have the same spacing
+    // CSS will handle showing dividers between completed non-highlighted items
+    const borderClasses = isActiveStep 
+      ? 'border-l-4 border-l-green-500 mb-2' 
+      : 'mb-2';
+    
+    let backgroundClass = 'bg-white/5';
+    let hoverClass = 'hover:bg-white/8';
     if (completed) {
+      // Completed items have very subtle faded background
       if (importance === 'high') {
+        // Completed highlighted items: faded lighter white background
         backgroundClass = 'bg-white/5';
-        hoverClass = 'hover:bg-white/10';
+        hoverClass = 'hover:bg-white/8';
+      } else {
+        backgroundClass = 'bg-white/3';
+        hoverClass = 'hover:bg-white/5';
       }
     } else if (importance === 'high') {
-      backgroundClass = 'bg-white/5';
-      hoverClass = 'hover:bg-white/10';
+      // Non-completed highlighted items: lighter white background
+      backgroundClass = 'bg-white/10';
+      hoverClass = 'hover:bg-white/15';
     }
     
     return `pt-4 ${hasUndoButton ? 'pb-3' : 'pb-4'} px-4 ${borderClasses} ${backgroundClass} cursor-pointer transition-colors ${hoverClass}`;
@@ -108,16 +117,22 @@ export function ViewTaskItem({
     onEdit();
   };
 
+  // Check if this is a completed non-highlighted item for CSS class
+  const isNonHighlightedCompleted = completed && importance !== 'high';
+  
   return (
     <>
       <div
         data-task-id={task.id}
+        data-completed-non-highlighted={isNonHighlightedCompleted ? 'true' : undefined}
         onClick={handleCardClick}
         className={`transition-all ${getContainerClasses()}`}
       >
         <div className="flex flex-col">
           {/* Step Number */}
-          <div className="font-semibold text-xs sm:text-sm mb-1 text-white/60">
+          <div className={`font-semibold text-xs sm:text-sm mb-1 ${
+            completed ? 'text-white/40' : 'text-white/60'
+          }`}>
             STEP {task.stepNumber}
           </div>
           
@@ -146,7 +161,7 @@ export function ViewTaskItem({
                 <div className="flex-1 min-w-0">
                   <div className={`flex items-center gap-2 flex-wrap ${task.description ? 'mb-1' : ''}`}>
                     <h3 className={`${styles.title} m-0 inline-block align-middle ${
-                      completed ? 'text-white/30 line-through uppercase' : 'text-white/60 uppercase'
+                      completed ? 'text-white/30 line-through uppercase' : 'text-white uppercase'
                     } break-words`}>
                       {task.title}
                     </h3>
@@ -166,7 +181,7 @@ export function ViewTaskItem({
                   </div>
                   {task.description && (
                     <p className={`${styles.description} line-clamp-2 ${
-                      completed ? 'text-white/40' : 'text-white/70'
+                      completed ? 'text-white/40' : 'text-white'
                     }`}>
                       {task.description}
                     </p>
