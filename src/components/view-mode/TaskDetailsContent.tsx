@@ -47,11 +47,11 @@ export function ViewTaskDetailsContent({
     <div className="space-y-6 mb-4">
       {/* Title and Description */}
       <div>
-        <h2 className="text-2xl font-semibold mb-2 text-white/60 uppercase">
+        <h2 className="text-2xl font-semibold mb-2 text-white uppercase">
           {task.title || 'Untitled Task'}
         </h2>
         {task.description && (
-          <p className="text-base leading-relaxed whitespace-pre-wrap text-white/70">
+          <p className="text-base leading-relaxed whitespace-pre-wrap text-white">
             {task.description}
           </p>
         )}
@@ -183,7 +183,7 @@ export function ViewTaskDetailsContent({
                   }
                   .instructions-content p {
                     margin: 0.5em 0;
-                    color: rgba(255, 255, 255, 0.7);
+                    color: #ffffff;
                   }
                   .instructions-content img {
                     max-width: 100%;

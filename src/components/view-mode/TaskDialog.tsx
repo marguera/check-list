@@ -84,26 +84,24 @@ export function ViewTaskDialog({
                           <Check className="w-5 h-5 text-green-400" />
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-green-400">Step Completed</div>
-                          <div className="text-xs text-white/60">This step has been completed. You are viewing it for reference.</div>
+                          <div className="text-base font-semibold text-green-400">Step Completed</div>
+                          <div className="text-sm text-white/60">This step has been completed. You are viewing it for reference.</div>
                         </div>
                       </div>
                     </div>
                   )}
                   
-                  <div className={isCompleted ? 'opacity-75' : ''}>
-                    <ViewTaskDetailsContent
-                      task={task}
-                      knowledgeItems={knowledgeItems}
-                      onKnowledgeLinkClick={(item) => {
-                        setViewingItem(item);
-                        setViewerOpen(true);
-                      }}
-                      onImageClick={(imageUrl) => {
-                        setSelectedImage(imageUrl);
-                      }}
-                    />
-                  </div>
+                  <ViewTaskDetailsContent
+                    task={task}
+                    knowledgeItems={knowledgeItems}
+                    onKnowledgeLinkClick={(item) => {
+                      setViewingItem(item);
+                      setViewerOpen(true);
+                    }}
+                    onImageClick={(imageUrl) => {
+                      setSelectedImage(imageUrl);
+                    }}
+                  />
                   
                   {/* Confirmation Checkbox - only show for current incomplete step */}
                   {!isCompleted && isCurrentStep && onComplete && (
