@@ -15,6 +15,7 @@ import { ImagesTab } from './ImagesTab';
 import { Task, KnowledgeItem } from '../../types';
 import { extractKnowledgeLinkIds } from '../../utils/knowledgeLinks';
 import { extractImageUrls } from '../../utils/imageExtraction';
+import { isInstructionsEmpty } from '../../utils/instructions';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
 import { ImageViewerDialog } from './ImageViewerDialog';
 
@@ -150,7 +151,8 @@ export function TaskDialog({
   }, [instructions, isViewMode, knowledgeItems]);
 
   // Determine which tabs to show
-  const tabCount = 1 + (hasKnowledgeLinks ? 1 : 0) + (hasImages ? 1 : 0);
+  const hasInstructions = !isInstructionsEmpty(instructions);
+  const tabCount = (hasInstructions ? 1 : 0) + (hasKnowledgeLinks ? 1 : 0) + (hasImages ? 1 : 0);
   const gridCols = tabCount === 1 ? 'grid-cols-1' : tabCount === 2 ? 'grid-cols-2' : 'grid-cols-3';
 
   return (
@@ -167,13 +169,13 @@ export function TaskDialog({
         <div className="w-full h-full flex flex-col">
           <DialogHeader className="px-0 pt-0 pb-0 border-0">
             <MobileViewHeader
-              title={mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : 'Task Details'}
+              title={mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : ''}
               onBack={() => onOpenChange(false)}
               showBackButton={true}
             />
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
+          <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4">
             <MobileViewContainer>
           <div className="space-y-6 mb-4">
             {isViewMode ? (
@@ -219,30 +221,34 @@ export function TaskDialog({
             )}
           </div>
 
-          <Tabs defaultValue="instructions" className="w-full">
-            <TabsList className={`grid w-full ${gridCols}`}>
-              <TabsTrigger value="instructions">Instructions</TabsTrigger>
-              {hasKnowledgeLinks && (
-                <TabsTrigger value="knowledge">
-                  Knowledge Database ({getAllKnowledgeLinks().length})
-                </TabsTrigger>
-              )}
-              {hasImages && (
-                <TabsTrigger value="images">
-                  Images ({imageUrls.length})
-                </TabsTrigger>
-              )}
-            </TabsList>
-            <TabsContent value="instructions" className="mt-4">
-              {isViewMode ? (
-                <div className="prose prose-sm max-w-none">
-                  <div 
-                    ref={instructionsRef}
-                    className="instructions-content"
-                    dangerouslySetInnerHTML={{ __html: instructions || 'No instructions provided.' }} 
-                    tabIndex={-1}
-                    style={{ outline: 'none' }}
-                  />
+          {tabCount > 0 && (
+            <Tabs defaultValue={hasInstructions ? "instructions" : (hasKnowledgeLinks ? "knowledge" : "images")} className="w-full">
+              <TabsList className={`grid w-full ${gridCols}`}>
+                {hasInstructions && (
+                  <TabsTrigger value="instructions">Instructions</TabsTrigger>
+                )}
+                {hasKnowledgeLinks && (
+                  <TabsTrigger value="knowledge">
+                    Knowledge Database ({getAllKnowledgeLinks().length})
+                  </TabsTrigger>
+                )}
+                {hasImages && (
+                  <TabsTrigger value="images">
+                    Images ({imageUrls.length})
+                  </TabsTrigger>
+                )}
+              </TabsList>
+              {hasInstructions && (
+                <TabsContent value="instructions" className="mt-4">
+                {isViewMode ? (
+                  <div className="prose prose-sm max-w-none">
+                    <div 
+                      ref={instructionsRef}
+                      className="instructions-content"
+                      dangerouslySetInnerHTML={{ __html: instructions }} 
+                      tabIndex={-1}
+                      style={{ outline: 'none' }}
+                    />
                   <style>{`
                     .instructions-content {
                       outline: none !important;
@@ -377,22 +383,24 @@ export function TaskDialog({
                   taskId={task?.id}
                 />
               )}
-            </TabsContent>
-            {hasKnowledgeLinks && (
-              <TabsContent value="knowledge" className="mt-4">
-                <KnowledgeDatabaseTab
-                  linkedItemIds={knowledgeLinks}
-                  knowledgeItems={knowledgeItems}
-                  instructions={instructions}
-                />
               </TabsContent>
-            )}
-            {hasImages && (
-              <TabsContent value="images" className="mt-4">
-                <ImagesTab imageUrls={imageUrls} />
-              </TabsContent>
+              )}
+              {hasKnowledgeLinks && (
+                <TabsContent value="knowledge" className="mt-4">
+                  <KnowledgeDatabaseTab
+                    linkedItemIds={knowledgeLinks}
+                    knowledgeItems={knowledgeItems}
+                    instructions={instructions}
+                  />
+                </TabsContent>
+              )}
+              {hasImages && (
+                <TabsContent value="images" className="mt-4">
+                  <ImagesTab imageUrls={imageUrls} />
+                </TabsContent>
+              )}
+            </Tabs>
           )}
-        </Tabs>
             </MobileViewContainer>
           </div>
 

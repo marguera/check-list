@@ -16,7 +16,7 @@ export function MobileViewHeader({
   children,
 }: MobileViewHeaderProps) {
   return (
-    <div className="bg-white px-6 py-4 border-b" style={{ width: '100vw', marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}>
+    <div className="bg-white px-4 sm:px-6 py-4 border-b" style={{ width: '100vw', marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}>
       <div className="flex items-center gap-3 max-w-4xl mx-auto">
         {showBackButton && onBack && (
           <Button
@@ -29,7 +29,7 @@ export function MobileViewHeader({
             Back
           </Button>
         )}
-        <h1 className="text-2xl font-bold text-slate-900 flex-1">{title}</h1>
+        <h1 className="text-xl font-bold text-slate-900 flex-1">{title}</h1>
         {children}
       </div>
     </div>

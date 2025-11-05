@@ -36,7 +36,7 @@ export function AllWorkflowsPage() {
       <MobileViewHeader title="Workflows" />
       
       {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
+      <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4">
         <MobileViewContainer>
           <p className="text-slate-600 mb-6">Select a workflow to view and check tasks</p>
 

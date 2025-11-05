@@ -278,7 +278,7 @@ export function WorkflowView({
     // Ref for scrollable container
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-    // Scroll to first non-completed task on mount or when tasks/completion state changes
+    // Scroll to last completed task on initial load and when tasks are checked/unchecked
     useEffect(() => {
       if (!readOnly || !scrollContainerRef.current || !isTaskCompleted || !actualSelectedWorkflow.version) {
         return;
@@ -301,12 +301,18 @@ export function WorkflowView({
         const taskElement = container.querySelector(`[data-task-id="${lastCompletedTask.id}"]`) as HTMLElement;
         if (!taskElement) return;
 
-        // Calculate scroll position: task offset from container top minus offset to show part of previous task
-        const scrollOffset = 120; // Offset to show part of the task above (adjust as needed)
-        const taskOffsetTop = taskElement.offsetTop;
-        const scrollPosition = taskOffsetTop - scrollOffset;
-
-        // Scroll to position
+        // Scroll to the last completed task, ensuring it's fully visible
+        // Calculate position relative to the scrollable container using getBoundingClientRect
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = taskElement.getBoundingClientRect();
+        
+        // Calculate the scroll position needed to align the task with the top of the container
+        // Account for container's padding (py-4 = 16px)
+        const containerPadding = 16;
+        const currentScrollTop = container.scrollTop;
+        const relativeTop = elementRect.top - containerRect.top;
+        const scrollPosition = currentScrollTop + relativeTop - containerPadding;
+        
         container.scrollTo({
           top: Math.max(0, scrollPosition),
           behavior: 'smooth'
@@ -322,13 +328,13 @@ export function WorkflowView({
           <div className="w-full h-screen flex flex-col fixed inset-0 bg-slate-50">
             {/* Header matching dialog style - full width */}
             <MobileViewHeader
-              title={actualSelectedWorkflow.title}
+              title={`Workflow: ${actualSelectedWorkflow.title}`}
               onBack={handleBackToWorkflows}
               showBackButton={true}
             />
             
             {/* Scrollable content area */}
-            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4">
               <MobileViewContainer>
                 {/* Description and progress below header */}
                 {actualSelectedWorkflow.description && (

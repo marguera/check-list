@@ -3,6 +3,7 @@ import { KnowledgeItem } from '../../types';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
 import { ImageViewerDialog } from './ImageViewerDialog';
 import { useState, useEffect, useRef } from 'react';
+import { isInstructionsEmpty } from '../../utils/instructions';
 
 interface InstructionsTabProps {
   instructions: string;
@@ -75,18 +76,19 @@ export function InstructionsTab({
 
   // In view/preview mode, don't render TipTap editor at all
   if (!editable) {
+    if (isInstructionsEmpty(instructions)) {
+      return null;
+    }
+    
     return (
       <>
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-slate-700 mb-2 block">
-              Instructions
-            </label>
             <div className="prose prose-sm max-w-none">
               <div 
                 ref={instructionsRef}
                 className="instructions-content"
-                dangerouslySetInnerHTML={{ __html: instructions || 'No instructions provided.' }} 
+                dangerouslySetInnerHTML={{ __html: instructions }} 
                 tabIndex={-1}
                 style={{ outline: 'none' }}
               />
