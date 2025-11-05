@@ -96,10 +96,10 @@ export function KnowledgeItemViewer({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 [&>button]:hidden"
+        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 [&>button]:hidden !bg-[#19191A]"
       >
-        <div className="w-full h-full flex flex-col">
-          <DialogHeader className="px-0 pt-0 pb-0 border-0">
+        <div className="w-full h-full flex flex-col text-white">
+          <DialogHeader className="px-0 pt-0 pb-0 border-0 !space-y-0">
             <DialogTitle className="sr-only">
               {currentItem.title}
             </DialogTitle>
@@ -116,7 +116,7 @@ export function KnowledgeItemViewer({
         <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-4">
           <MobileViewContainer>
             {currentItem.description && (
-              <p className="text-lg text-slate-600 mb-6">{currentItem.description}</p>
+              <p className="text-lg text-white/70 mb-6">{currentItem.description}</p>
             )}
             <div className="prose prose-lg max-w-none">
               <div 
@@ -130,46 +130,46 @@ export function KnowledgeItemViewer({
                 font-weight: bold;
                 margin: 0.67em 0;
                 line-height: 1.2;
-                color: #0f172a;
+                color: #ffffff;
               }
               .knowledge-content h2 {
                 font-size: 1.5em;
                 font-weight: bold;
                 margin: 0.75em 0;
                 line-height: 1.3;
-                color: #0f172a;
+                color: #ffffff;
               }
               .knowledge-content h3 {
                 font-size: 1.17em;
                 font-weight: bold;
                 margin: 0.83em 0;
                 line-height: 1.4;
-                color: #0f172a;
+                color: #ffffff;
               }
               .knowledge-content h4 {
                 font-size: 1em;
                 font-weight: bold;
                 margin: 1em 0;
                 line-height: 1.5;
-                color: #0f172a;
+                color: #ffffff;
               }
               .knowledge-content h5 {
                 font-size: 0.83em;
                 font-weight: bold;
                 margin: 1.17em 0;
                 line-height: 1.5;
-                color: #0f172a;
+                color: #ffffff;
               }
               .knowledge-content h6 {
                 font-size: 0.67em;
                 font-weight: bold;
                 margin: 1.33em 0;
                 line-height: 1.5;
-                color: #0f172a;
+                color: #ffffff;
               }
               .knowledge-content p {
                 margin: 0.5em 0;
-                color: #334155;
+                color: rgba(255, 255, 255, 0.7);
               }
               .knowledge-content img {
                 max-width: 100%;
@@ -190,20 +190,20 @@ export function KnowledgeItemViewer({
                 margin-bottom: 1em;
               }
               .knowledge-content a {
-                color: #2563eb;
+                color: #60a5fa;
                 text-decoration: underline;
               }
               .knowledge-content a:hover {
-                color: #1d4ed8;
+                color: #93c5fd;
               }
               .knowledge-content a[data-knowledge-link] {
-                color: #2563eb;
+                color: #60a5fa;
                 text-decoration: underline;
                 cursor: pointer;
                 pointer-events: auto;
               }
               .knowledge-content a[data-knowledge-link]:hover {
-                color: #1d4ed8;
+                color: #93c5fd;
                 text-decoration: underline;
               }
               .knowledge-content ul,

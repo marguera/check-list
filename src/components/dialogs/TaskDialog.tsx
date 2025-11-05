@@ -132,15 +132,15 @@ export function TaskDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 [&>button]:hidden"
+        className={`!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 !gap-0 [&>button]:hidden ${isViewMode ? '!bg-[#19191A]' : ''}`}
         onOpenAutoFocus={(e) => {
           if (isViewMode) {
             e.preventDefault();
           }
         }}
       >
-        <div className="w-full h-full flex flex-col">
-          <DialogHeader className="px-0 pt-0 pb-0 border-0">
+        <div className={`w-full h-full flex flex-col ${isViewMode ? 'text-white' : ''}`}>
+          <DialogHeader className="px-0 pt-0 pb-0 border-0 !space-y-0">
             <DialogTitle className="sr-only">
               {mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : (task ? `Step ${task.stepNumber}` : '')}
             </DialogTitle>
@@ -160,14 +160,14 @@ export function TaskDialog({
                 <>
                   {/* Completed Step Indicator */}
                   {isCompleted && (
-                    <div className="mb-4 pb-4 border-b border-slate-200">
+                    <div className="mb-4 pb-4 border-b border-white/20">
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
-                          <Check className="w-5 h-5 text-green-600" />
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20">
+                          <Check className="w-5 h-5 text-green-400" />
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-green-700">Step Completed</div>
-                          <div className="text-xs text-slate-500">This step has been completed. You are viewing it for reference.</div>
+                          <div className="text-sm font-semibold text-green-400">Step Completed</div>
+                          <div className="text-xs text-white/60">This step has been completed. You are viewing it for reference.</div>
                         </div>
                       </div>
                     </div>
@@ -190,8 +190,8 @@ export function TaskDialog({
                   
                   {/* Confirmation Checkbox - only show for current incomplete step */}
                   {!isCompleted && isCurrentStep && onComplete && (
-                    <div className="pt-6 mt-6 border-t border-slate-200 pb-4">
-                      <h3 className="font-semibold text-slate-900 mb-3">Confirmation Required</h3>
+                    <div className="pt-6 mt-6 border-t border-white/20 pb-4">
+                      <h3 className="font-semibold text-white mb-3">Confirm below to complete this step</h3>
                       <div className="flex items-center space-x-2.5">
                         <input
                           type="checkbox"
@@ -202,7 +202,7 @@ export function TaskDialog({
                         />
                         <label
                           htmlFor="confirm-checkbox"
-                          className="text-sm text-slate-700 cursor-pointer"
+                          className="text-sm text-white/80 cursor-pointer"
                         >
                           I confirm all instructions were followed
                         </label>
@@ -310,10 +310,10 @@ export function TaskDialog({
           )}
           
           {isViewMode && !isCompleted && isCurrentStep && onComplete && (
-            <DialogFooter className="px-6 pb-6 pt-4 border-t bg-white">
+            <DialogFooter className="px-6 pb-6 pt-4 border-t border-white/20 bg-[#19191A]">
               <MobileViewContainer>
                 <div className="flex justify-end gap-2 w-full">
-                  <Button variant="outline" onClick={() => onOpenChange(false)}>
+                  <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/20 text-white hover:bg-white/10 !bg-transparent">
                     Cancel
                   </Button>
                   <Button

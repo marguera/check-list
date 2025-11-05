@@ -58,7 +58,7 @@ export function TaskItem({
     switch (importance) {
       case 'high':
         return {
-          title: 'text-2xl font-bold',
+          title: mode === 'view' ? 'text-2xl font-semibold' : 'text-2xl font-bold',
           description: 'text-base',
           border: 'border border-slate-200',
           padding: 'p-5',
@@ -69,7 +69,7 @@ export function TaskItem({
       case 'low':
       default:
         return {
-          title: 'text-lg font-semibold',
+          title: mode === 'view' ? 'text-lg font-medium' : 'text-lg font-semibold',
           description: 'text-sm',
           border: 'border border-slate-200',
           padding: 'p-4',
@@ -92,25 +92,25 @@ export function TaskItem({
       const isActiveStep = !completed && currentStepTaskId === task.id;
       // Use pt-4 for top padding, adjust bottom padding to match spacing
       // When undo button is present, it adds mt-1 spacing, so we need more padding to match
-      // Base background: white for incomplete, transparent for completed
+      // Base background: transparent for dark mode
       // Active steps have left green border and bottom divider, others just have bottom border
       const borderClasses = isActiveStep 
-        ? 'border-l-4 border-l-green-600 border-b border-slate-200' 
-        : 'border-b border-slate-200';
-      // Background: high importance gets amber, completed high importance gets subtle darker, completed others get transparent, others get white
-      let backgroundClass = 'bg-white';
-      let hoverClass = 'hover:bg-slate-50';
+        ? 'border-l-4 border-l-green-500 border-b border-white/20' 
+        : 'border-b border-white/20';
+      // Background: high importance gets subtle highlight, completed high importance gets darker, completed others get transparent
+      let backgroundClass = 'bg-transparent';
+      let hoverClass = 'hover:bg-white/5';
       if (completed) {
         if (importance === 'high') {
-          backgroundClass = 'bg-slate-100';
-          hoverClass = 'hover:bg-slate-200';
+          backgroundClass = 'bg-white/5';
+          hoverClass = 'hover:bg-white/10';
         } else {
           backgroundClass = 'bg-transparent';
-          hoverClass = 'hover:bg-slate-50';
+          hoverClass = 'hover:bg-white/5';
         }
       } else if (importance === 'high') {
-        backgroundClass = 'bg-amber-50';
-        hoverClass = 'hover:bg-amber-100';
+        backgroundClass = 'bg-white/5';
+        hoverClass = 'hover:bg-white/10';
       }
       const baseClasses = `pt-4 ${hasUndoButton ? 'pb-3' : 'pb-4'} px-4 ${borderClasses} ${backgroundClass} cursor-pointer transition-colors ${hoverClass}`;
       return baseClasses;
@@ -209,7 +209,7 @@ export function TaskItem({
         {/* Layout: Column with buttons on new line for all screen sizes */}
         <div className="flex flex-col">
           {/* Step Number */}
-          <div className="text-slate-600 font-semibold text-xs sm:text-sm mb-1">
+          <div className={`font-semibold text-xs sm:text-sm mb-1 ${mode === 'view' ? 'text-white/60' : 'text-slate-600'}`}>
             STEP {task.stepNumber}
           </div>
           {/* Main content row (image + content) */}
@@ -221,7 +221,7 @@ export function TaskItem({
                   {mode === 'view' ? (
                     <button
                       onClick={handleImageClick}
-                      className={`${styles.imageSize} bg-slate-100 rounded-lg overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity`}
+                      className={`${styles.imageSize} bg-white/10 rounded-lg overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity`}
                       title="Click to view full size"
                     >
                       <img
@@ -287,31 +287,35 @@ export function TaskItem({
                 <div className="flex-1 min-w-0">
                   <div className={`flex items-center gap-2 flex-wrap ${task.description ? 'mb-1' : ''}`}>
                     <h3 className={`${styles.title} m-0 inline-block align-middle ${
-                      completed 
-                        ? 'text-slate-500 line-through' 
-                        : 'text-slate-900'
+                      mode === 'view' 
+                        ? (completed ? 'text-white/30 line-through uppercase' : 'text-white/60 uppercase')
+                        : (completed ? 'text-slate-500 line-through' : 'text-slate-900')
                     } break-words`}>
                       {task.title}
                     </h3>
                     {/* Show completion check and text as unified element */}
                     {mode === 'view' && completed && (
                       <span className="inline-flex items-center gap-1 flex-shrink-0 align-middle" title="Task completed">
-                        <Check className="w-4 h-4 text-green-600" />
-                        <span className="text-xs font-medium text-green-600 uppercase">COMPLETED</span>
+                        <Check className="w-4 h-4 text-green-400" />
+                        <span className="text-xs font-medium text-green-400 uppercase">COMPLETED</span>
                       </span>
                     )}
                     {/* Show current badge after title for active step */}
                     {isActiveStep && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 flex-shrink-0">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                        mode === 'view' 
+                          ? 'bg-green-500/20 text-green-400' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
                         CURRENT
                       </span>
                     )}
                   </div>
                   {task.description && (
                     <p className={`${styles.description} line-clamp-2 ${
-                      completed 
-                        ? 'text-slate-400' 
-                        : 'text-slate-600'
+                      mode === 'view'
+                        ? (completed ? 'text-white/40' : 'text-white/70')
+                        : (completed ? 'text-slate-400' : 'text-slate-600')
                     }`}>
                       {task.description}
                     </p>
@@ -373,7 +377,7 @@ export function TaskItem({
                   e.stopPropagation();
                   onUndo();
                 }}
-                className="text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer transition-colors px-3 py-1.5 text-xs font-medium rounded-md flex items-center justify-center gap-1.5 w-full"
+                className="text-white/80 bg-white/10 hover:bg-white/20 cursor-pointer transition-colors px-3 py-1.5 text-xs font-medium rounded-md flex items-center justify-center gap-1.5 w-full"
                 title="Uncheck this step"
               >
                 <RotateCcw className="w-3 h-3 flex-shrink-0" />

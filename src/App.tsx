@@ -20,7 +20,7 @@ function AppLayout({ children }: { children: ReactNode }) {
   const isViewMode = !isEditRoute && (location.pathname === '/' || /^\/[^/]+$/.test(location.pathname));
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className={`min-h-screen ${isViewMode ? 'bg-[#19191A] text-white' : 'bg-slate-50'}`}>
       <ModeHeader />
       {!isViewMode && (
         <>
@@ -32,7 +32,7 @@ function AppLayout({ children }: { children: ReactNode }) {
         </>
       )}
       {isViewMode && (
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4 max-w-4xl text-white">
           {children}
         </div>
       )}

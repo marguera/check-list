@@ -58,11 +58,11 @@ export function TaskDetailsContent({
     <div className="space-y-6 mb-4">
       {/* Title and Description */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">
+        <h2 className={`text-2xl font-semibold mb-2 ${isViewMode ? 'text-white/60 uppercase' : 'text-slate-900'}`}>
           {task.title || 'Untitled Task'}
         </h2>
         {task.description && (
-          <p className="text-base text-slate-700 leading-relaxed whitespace-pre-wrap">
+          <p className={`text-base leading-relaxed whitespace-pre-wrap ${isViewMode ? 'text-white/70' : 'text-slate-700'}`}>
             {task.description}
           </p>
         )}
@@ -71,22 +71,22 @@ export function TaskDetailsContent({
       {/* Tabs for Instructions, Knowledge Database, and Images */}
       {tabCount > 0 && (
         <Tabs defaultValue={hasInstructions ? "instructions" : (hasKnowledgeLinks ? "knowledge" : "images")} className="w-full">
-          <TabsList className={`grid w-full ${gridCols}`}>
+          <TabsList className={`grid w-full ${gridCols} ${isViewMode ? 'bg-white/10 text-white/70' : ''}`}>
             {hasInstructions && (
-              <TabsTrigger value="instructions" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="instructions" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white' : ''}`}>
                 <Info className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Instructions</span>
               </TabsTrigger>
             )}
             {hasKnowledgeLinks && (
-              <TabsTrigger value="knowledge" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="knowledge" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white' : ''}`}>
                 <BookOpen className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Knowledge Database ({getAllKnowledgeLinks().length})</span>
                 <span className="sm:hidden">({getAllKnowledgeLinks().length})</span>
               </TabsTrigger>
             )}
             {hasImages && (
-              <TabsTrigger value="images" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="images" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white' : ''}`}>
                 <ImageIcon className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Images ({imageUrls.length})</span>
                 <span className="sm:hidden">({imageUrls.length})</span>
@@ -157,46 +157,46 @@ export function TaskDetailsContent({
                       font-weight: bold;
                       margin: 0.67em 0;
                       line-height: 1.2;
-                      color: #0f172a;
+                      color: ${isViewMode ? '#ffffff' : '#0f172a'};
                     }
                     .instructions-content h2 {
                       font-size: 1.5em;
                       font-weight: bold;
                       margin: 0.75em 0;
                       line-height: 1.3;
-                      color: #0f172a;
+                      color: ${isViewMode ? '#ffffff' : '#0f172a'};
                     }
                     .instructions-content h3 {
                       font-size: 1.17em;
                       font-weight: bold;
                       margin: 0.83em 0;
                       line-height: 1.4;
-                      color: #0f172a;
+                      color: ${isViewMode ? '#ffffff' : '#0f172a'};
                     }
                     .instructions-content h4 {
                       font-size: 1em;
                       font-weight: bold;
                       margin: 1em 0;
                       line-height: 1.5;
-                      color: #0f172a;
+                      color: ${isViewMode ? '#ffffff' : '#0f172a'};
                     }
                     .instructions-content h5 {
                       font-size: 0.83em;
                       font-weight: bold;
                       margin: 1.17em 0;
                       line-height: 1.5;
-                      color: #0f172a;
+                      color: ${isViewMode ? '#ffffff' : '#0f172a'};
                     }
                     .instructions-content h6 {
                       font-size: 0.67em;
                       font-weight: bold;
                       margin: 1.33em 0;
                       line-height: 1.5;
-                      color: #0f172a;
+                      color: ${isViewMode ? '#ffffff' : '#0f172a'};
                     }
                     .instructions-content p {
                       margin: 0.5em 0;
-                      color: #334155;
+                      color: ${isViewMode ? 'rgba(255, 255, 255, 0.7)' : '#334155'};
                     }
                     .instructions-content img {
                       max-width: 100%;
@@ -222,17 +222,17 @@ export function TaskDetailsContent({
                       margin-bottom: 1em;
                     }
                     .instructions-content a[data-knowledge-link] {
-                      color: #2563eb;
+                      color: ${isViewMode ? '#60a5fa' : '#2563eb'};
                       text-decoration: underline;
                       cursor: pointer;
                       pointer-events: auto;
                     }
                     .instructions-content a[data-knowledge-link]:hover {
-                      color: #1d4ed8;
+                      color: ${isViewMode ? '#93c5fd' : '#1d4ed8'};
                       text-decoration: underline;
                     }
                     .instructions-content a:not([data-knowledge-link]) {
-                      color: #2563eb;
+                      color: ${isViewMode ? '#60a5fa' : '#2563eb'};
                       text-decoration: underline;
                     }
                     .instructions-content ul,
@@ -270,12 +270,13 @@ export function TaskDetailsContent({
                 linkedItemIds={task.knowledgeDatabaseLinks || []}
                 knowledgeItems={knowledgeItems}
                 instructions={taskInstructions}
+                mode={mode}
               />
             </TabsContent>
           )}
           {hasImages && (
             <TabsContent value="images" className="mt-4">
-              <ImagesTab imageUrls={imageUrls} />
+              <ImagesTab imageUrls={imageUrls} mode={mode} />
             </TabsContent>
           )}
         </Tabs>

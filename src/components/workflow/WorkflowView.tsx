@@ -317,7 +317,7 @@ export function WorkflowView({
     return (
       <div>
         {readOnly ? (
-          <div className="w-full h-screen flex flex-col fixed inset-0 bg-slate-50">
+          <div className="w-full h-screen flex flex-col fixed inset-0 bg-[#19191A] text-white">
             {/* Header matching dialog style - full width */}
             <MobileViewHeader
               title={`Workflow: ${actualSelectedWorkflow.title}`}
@@ -330,22 +330,22 @@ export function WorkflowView({
               <MobileViewContainer>
                 {/* Description and progress below header */}
                 {actualSelectedWorkflow.description && (
-                  <p className="text-lg text-slate-600 mb-4 px-4">{actualSelectedWorkflow.description}</p>
+                  <p className="text-lg text-white/70 mb-4 px-4">{actualSelectedWorkflow.description}</p>
                 )}
                 
                 {/* Progress Bar */}
                 <div className="mb-6 px-4">
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-slate-600">
+                    <span className="text-white/70">
                       {completedTasks} of {totalTasks} tasks completed
                     </span>
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-white">
                       {progressPercentage}%
                     </span>
                   </div>
-                  <div className="w-full bg-slate-200 rounded-full h-2">
+                  <div className="w-full bg-white/20 rounded-full h-2">
                     <div
-                      className="bg-slate-900 h-2 rounded-full transition-all duration-300"
+                      className="bg-white h-2 rounded-full transition-all duration-300"
                       style={{ width: `${progressPercentage}%` }}
                     />
                   </div>

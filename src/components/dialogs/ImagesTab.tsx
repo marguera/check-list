@@ -4,16 +4,18 @@ import { ImageViewerDialog } from './ImageViewerDialog';
 
 interface ImagesTabProps {
   imageUrls: string[];
+  mode?: 'view' | 'edit' | 'completion';
 }
 
-export function ImagesTab({ imageUrls }: ImagesTabProps) {
+export function ImagesTab({ imageUrls, mode = 'edit' }: ImagesTabProps) {
+  const isViewMode = mode === 'view' || mode === 'completion';
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   if (imageUrls.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <ImageIcon className="h-12 w-12 text-slate-300 mb-4" />
-        <p className="text-slate-500">No images in instructions</p>
+        <ImageIcon className={`h-12 w-12 mb-4 ${isViewMode ? 'text-white/30' : 'text-slate-300'}`} />
+        <p className={isViewMode ? 'text-white/60' : 'text-slate-500'}>No images in instructions</p>
       </div>
     );
   }
@@ -21,14 +23,18 @@ export function ImagesTab({ imageUrls }: ImagesTabProps) {
   return (
     <>
       <div className="space-y-4">
-        <div className="text-sm text-slate-600 mb-4">
+        <div className={`text-sm mb-4 ${isViewMode ? 'text-white/70' : 'text-slate-600'}`}>
           {imageUrls.length} image{imageUrls.length !== 1 ? 's' : ''} in instructions
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {imageUrls.map((url, index) => (
             <div
               key={index}
-              className="border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+              className={`border rounded-lg overflow-hidden transition-shadow cursor-pointer ${
+                isViewMode 
+                  ? 'border-white/20 hover:shadow-lg hover:shadow-white/10' 
+                  : 'border-slate-200 hover:shadow-md'
+              }`}
               onClick={() => setSelectedImage(url)}
             >
               <img
