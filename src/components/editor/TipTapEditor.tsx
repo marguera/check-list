@@ -23,6 +23,7 @@ interface TipTapEditorProps {
   knowledgeItems: KnowledgeItem[];
   onInsertKnowledgeLink?: (item: KnowledgeItem) => void;
   onKnowledgeLinkClick?: (item: KnowledgeItem) => void;
+  onImageClick?: (imageUrl: string) => void;
   editable?: boolean;
   showKnowledgeLinkButton?: boolean;
 }
@@ -33,6 +34,7 @@ export function TipTapEditor({
   knowledgeItems,
   onInsertKnowledgeLink,
   onKnowledgeLinkClick,
+  onImageClick,
   editable = true,
   showKnowledgeLinkButton = true,
 }: TipTapEditorProps) {
@@ -132,15 +134,16 @@ export function TipTapEditor({
     }
   }, [content, editor]);
 
-  // Handle clicks on knowledge links - ONLY in view mode (not editable)
+  // Handle clicks on knowledge links and images - ONLY in view mode (not editable)
   useEffect(() => {
-    if (!editor || !onKnowledgeLinkClick || editable) return;
+    if (!editor || editable) return;
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const link = target.closest('a[data-knowledge-link]') as HTMLAnchorElement;
       
-      if (link) {
+      // Check for knowledge links
+      const link = target.closest('a[data-knowledge-link]') as HTMLAnchorElement;
+      if (link && onKnowledgeLinkClick) {
         e.preventDefault();
         e.stopPropagation();
         const knowledgeId = link.getAttribute('data-knowledge-id');
@@ -150,6 +153,15 @@ export function TipTapEditor({
             onKnowledgeLinkClick(item);
           }
         }
+        return;
+      }
+      
+      // Check for images
+      const img = target.closest('img') as HTMLImageElement;
+      if (img && img.src && onImageClick) {
+        e.preventDefault();
+        e.stopPropagation();
+        onImageClick(img.src);
       }
     };
 
@@ -159,7 +171,7 @@ export function TipTapEditor({
     return () => {
       editorElement.removeEventListener('click', handleClick);
     };
-  }, [editor, onKnowledgeLinkClick, editable, knowledgeItems]);
+  }, [editor, onKnowledgeLinkClick, onImageClick, editable, knowledgeItems]);
 
   if (!editor) {
     return null;

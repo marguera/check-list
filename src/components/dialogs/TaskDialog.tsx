@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,7 @@ import { Task, KnowledgeItem } from '../../types';
 import { extractKnowledgeLinkIds } from '../../utils/knowledgeLinks';
 import { extractImageUrls } from '../../utils/imageExtraction';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
+import { ImageViewerDialog } from './ImageViewerDialog';
 
 interface TaskDialogProps {
   open: boolean;
@@ -39,6 +40,7 @@ export function TaskDialog({
   const [knowledgeLinks, setKnowledgeLinks] = useState<string[]>([]);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewingItem, setViewingItem] = useState<KnowledgeItem | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const instructionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,14 +102,22 @@ export function TaskDialog({
   const hasImages = imageUrls.length > 0;
   const hasKnowledgeLinks = getAllKnowledgeLinks().length > 0;
 
-  // Handle clicks on knowledge links in instructions
+  // Use a ref for the dialog content to attach event listeners
+  const dialogContentRef = useRef<HTMLDivElement>(null);
+
+  // Handle clicks on knowledge links and images in instructions using event delegation
   useEffect(() => {
-    if (!instructionsRef.current || !isViewMode) return;
+    if (!isViewMode || !dialogContentRef.current) return;
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const link = target.closest('a[data-knowledge-link]') as HTMLAnchorElement;
       
+      // Only handle clicks within the instructions content area
+      const instructionsContent = target.closest('.instructions-content');
+      if (!instructionsContent) return;
+      
+      // Check for knowledge links
+      const link = target.closest('a[data-knowledge-link]') as HTMLAnchorElement;
       if (link) {
         e.preventDefault();
         const knowledgeId = link.getAttribute('data-knowledge-id');
@@ -118,10 +128,19 @@ export function TaskDialog({
             setViewerOpen(true);
           }
         }
+        return;
+      }
+      
+      // Check for images
+      const img = target.closest('img') as HTMLImageElement;
+      if (img && img.src) {
+        e.preventDefault();
+        setSelectedImage(img.src);
       }
     };
 
-    const container = instructionsRef.current;
+    // Attach event listener to dialog content which persists across tab switches
+    const container = dialogContentRef.current;
     container.addEventListener('click', handleClick);
     
     return () => {
@@ -136,6 +155,7 @@ export function TaskDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
+        ref={dialogContentRef}
         className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0"
         onOpenAutoFocus={(e) => {
           if (isViewMode) {
@@ -293,6 +313,11 @@ export function TaskDialog({
                       height: auto;
                       border-radius: 0.5rem;
                       display: block;
+                      cursor: pointer;
+                      transition: opacity 0.2s;
+                    }
+                    .instructions-content img:hover {
+                      opacity: 0.9;
                     }
                     .instructions-content img:not([data-align]) {
                       margin: 1em auto;
@@ -369,6 +394,13 @@ export function TaskDialog({
         open={viewerOpen}
         onOpenChange={setViewerOpen}
         item={viewingItem}
+      />
+
+      <ImageViewerDialog
+        open={!!selectedImage}
+        onOpenChange={(open) => !open && setSelectedImage(null)}
+        imageUrl={selectedImage}
+        alt="Image preview"
       />
 
       <DialogFooter className="px-6 pb-6 pt-4 border-t">

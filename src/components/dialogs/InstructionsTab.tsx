@@ -1,6 +1,7 @@
 import { TipTapEditor } from '../editor/TipTapEditor';
 import { KnowledgeItem } from '../../types';
 import { KnowledgeItemViewer } from '../knowledge/KnowledgeItemViewer';
+import { ImageViewerDialog } from './ImageViewerDialog';
 import { useState, useEffect, useRef } from 'react';
 
 interface InstructionsTabProps {
@@ -22,20 +23,27 @@ export function InstructionsTab({
 }: InstructionsTabProps) {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewingItem, setViewingItem] = useState<KnowledgeItem | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const instructionsRef = useRef<HTMLDivElement>(null);
 
   const handleKnowledgeLinkInsert = (item: KnowledgeItem) => {
     onKnowledgeLinkInserted(item.id);
   };
 
-  // Handle clicks on knowledge links in instructions (non-editable mode)
+  // Handle clicks on knowledge links and images in instructions (non-editable mode)
+  // Use event delegation to handle tab switching
   useEffect(() => {
-    if (!instructionsRef.current || editable) return;
+    if (editable) return;
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const link = target.closest('a[data-knowledge-link]') as HTMLAnchorElement;
       
+      // Only handle clicks within the instructions content area
+      const instructionsContent = target.closest('.instructions-content');
+      if (!instructionsContent) return;
+      
+      // Check for knowledge links
+      const link = target.closest('a[data-knowledge-link]') as HTMLAnchorElement;
       if (link) {
         e.preventDefault();
         const knowledgeId = link.getAttribute('data-knowledge-id');
@@ -46,14 +54,22 @@ export function InstructionsTab({
             setViewerOpen(true);
           }
         }
+        return;
+      }
+      
+      // Check for images
+      const img = target.closest('img') as HTMLImageElement;
+      if (img && img.src) {
+        e.preventDefault();
+        setSelectedImage(img.src);
       }
     };
 
-    const container = instructionsRef.current;
-    container.addEventListener('click', handleClick);
+    // Use event delegation at document level with a selector check
+    document.addEventListener('click', handleClick);
     
     return () => {
-      container.removeEventListener('click', handleClick);
+      document.removeEventListener('click', handleClick);
     };
   }, [instructions, editable, knowledgeItems]);
 
@@ -149,6 +165,11 @@ export function InstructionsTab({
                 height: auto;
                 border-radius: 0.5rem;
                 display: block;
+                cursor: pointer;
+                transition: opacity 0.2s;
+              }
+              .instructions-content img:hover {
+                opacity: 0.9;
               }
               .instructions-content img:not([data-align]) {
                 margin: 1em auto;
@@ -200,6 +221,12 @@ export function InstructionsTab({
         onOpenChange={setViewerOpen}
         item={viewingItem}
       />
+      <ImageViewerDialog
+        open={!!selectedImage}
+        onOpenChange={(open) => !open && setSelectedImage(null)}
+        imageUrl={selectedImage}
+        alt="Image preview"
+      />
     </>
     );
   }
@@ -220,6 +247,9 @@ export function InstructionsTab({
           onKnowledgeLinkClick={(item) => {
             setViewingItem(item);
             setViewerOpen(true);
+          }}
+          onImageClick={(imageUrl) => {
+            setSelectedImage(imageUrl);
           }}
         />
       </div>

@@ -70,10 +70,15 @@ export function ImageNodeView({ node, updateAttributes, selected, editor, getPos
   }, [isSizeDropdownOpen]);
 
   const handleImageClick = useCallback((e: React.MouseEvent) => {
+    // If editor is not editable, let the click propagate to TipTapEditor's handler
+    if (!editor?.isEditable) {
+      return;
+    }
+    
     e.preventDefault();
     e.stopPropagation();
     
-    // Select the image node
+    // Select the image node (only in editable mode)
     if (editor && typeof getPos === 'function') {
       const pos = getPos();
       if (pos !== undefined) {
