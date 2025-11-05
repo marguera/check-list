@@ -110,12 +110,15 @@ export function TaskDialog({
   };
 
   const isViewMode = mode === 'view';
+  const isEditMode = mode === 'edit' || mode === 'add';
   const imageUrls = getAllImages();
   const hasImages = imageUrls.length > 0;
   const hasKnowledgeLinks = getAllKnowledgeLinks().length > 0;
 
   // Determine which tabs to show
-  const hasInstructions = !isInstructionsEmpty(instructions);
+  // In view mode: only show Instructions tab if there are instructions
+  // In edit/add mode: always show Instructions tab so users can add/edit instructions
+  const hasInstructions = isEditMode ? true : !isInstructionsEmpty(instructions);
   const tabCount = (hasInstructions ? 1 : 0) + (hasKnowledgeLinks ? 1 : 0) + (hasImages ? 1 : 0);
   const gridCols = tabCount === 1 ? 'grid-cols-1' : tabCount === 2 ? 'grid-cols-2' : 'grid-cols-3';
 
