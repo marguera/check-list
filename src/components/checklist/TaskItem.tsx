@@ -138,6 +138,7 @@ export function TaskItem({
   return (
     <>
       <div
+        data-task-id={task.id}
         onClick={handleCardClick}
         className={`
           mb-4 transition-all

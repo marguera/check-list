@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project, Task, TaskImportance } from '../../types';
 import { Button } from '../ui/button';
@@ -275,6 +275,47 @@ export function WorkflowView({
       }
     };
 
+    // Ref for scrollable container
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    // Scroll to first non-completed task on mount or when tasks/completion state changes
+    useEffect(() => {
+      if (!readOnly || !scrollContainerRef.current || !isTaskCompleted || !actualSelectedWorkflow.version) {
+        return;
+      }
+
+      // Wait for DOM to render
+      const timeoutId = setTimeout(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        // Find the last completed task
+        const sortedTasks = [...actualSelectedWorkflow.tasks].sort((a, b) => a.stepNumber - b.stepNumber);
+        const lastCompletedTask = [...sortedTasks].reverse().find(
+          task => isTaskCompleted(actualSelectedWorkflow.id, actualSelectedWorkflow.version!, task.id)
+        );
+
+        if (!lastCompletedTask) return;
+
+        // Find the task element by data attribute or query selector
+        const taskElement = container.querySelector(`[data-task-id="${lastCompletedTask.id}"]`) as HTMLElement;
+        if (!taskElement) return;
+
+        // Calculate scroll position: task offset from container top minus offset to show part of previous task
+        const scrollOffset = 120; // Offset to show part of the task above (adjust as needed)
+        const taskOffsetTop = taskElement.offsetTop;
+        const scrollPosition = taskOffsetTop - scrollOffset;
+
+        // Scroll to position
+        container.scrollTo({
+          top: Math.max(0, scrollPosition),
+          behavior: 'smooth'
+        });
+      }, 100); // Small delay to ensure DOM is ready
+
+      return () => clearTimeout(timeoutId);
+    }, [readOnly, actualSelectedWorkflow.id, actualSelectedWorkflow.version, actualSelectedWorkflow.tasks, isTaskCompleted]);
+
     return (
       <div>
         {readOnly ? (
@@ -287,7 +328,7 @@ export function WorkflowView({
             />
             
             {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
               <MobileViewContainer>
                 {/* Description and progress below header */}
                 {actualSelectedWorkflow.description && (
@@ -329,6 +370,9 @@ export function WorkflowView({
                   lastCompletedTaskId={lastCompletedTaskId}
                   onUndo={handleUndo}
                 />
+                
+                {/* Spacer to allow scrolling to first non-completed task */}
+                <div className="min-h-screen" />
               </MobileViewContainer>
             </div>
           </div>
