@@ -174,7 +174,7 @@ export function KnowledgeItemViewer({
               .knowledge-content img {
                 max-width: 100%;
                 height: auto;
-                border-radius: 0.5rem;
+                border-radius: 0;
                 display: block;
               }
               .knowledge-content img:not([data-align]) {

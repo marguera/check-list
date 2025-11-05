@@ -71,22 +71,22 @@ export function TaskDetailsContent({
       {/* Tabs for Instructions, Knowledge Database, and Images */}
       {tabCount > 0 && (
         <Tabs defaultValue={hasInstructions ? "instructions" : (hasKnowledgeLinks ? "knowledge" : "images")} className="w-full">
-          <TabsList className={`grid w-full ${gridCols} ${isViewMode ? 'bg-white/10 text-white/70' : ''}`}>
+          <TabsList className={`grid w-full ${gridCols} ${isViewMode ? 'bg-white/10 text-white/70 !rounded-none' : ''}`}>
             {hasInstructions && (
-              <TabsTrigger value="instructions" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white' : ''}`}>
+              <TabsTrigger value="instructions" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white !rounded-none' : ''}`}>
                 <Info className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Instructions</span>
               </TabsTrigger>
             )}
             {hasKnowledgeLinks && (
-              <TabsTrigger value="knowledge" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white' : ''}`}>
+              <TabsTrigger value="knowledge" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white !rounded-none' : ''}`}>
                 <BookOpen className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Knowledge Database ({getAllKnowledgeLinks().length})</span>
                 <span className="sm:hidden">({getAllKnowledgeLinks().length})</span>
               </TabsTrigger>
             )}
             {hasImages && (
-              <TabsTrigger value="images" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white' : ''}`}>
+              <TabsTrigger value="images" className={`flex items-center justify-center gap-2 ${isViewMode ? 'data-[state=active]:bg-white/20 data-[state=active]:text-white !rounded-none' : ''}`}>
                 <ImageIcon className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Images ({imageUrls.length})</span>
                 <span className="sm:hidden">({imageUrls.length})</span>
@@ -201,7 +201,7 @@ export function TaskDetailsContent({
                     .instructions-content img {
                       max-width: 100%;
                       height: auto;
-                      border-radius: 0.5rem;
+                      ${isViewMode ? 'border-radius: 0;' : 'border-radius: 0.5rem;'}
                       display: block;
                       cursor: pointer;
                       transition: opacity 0.2s;

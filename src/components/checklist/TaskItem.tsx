@@ -221,7 +221,7 @@ export function TaskItem({
                   {mode === 'view' ? (
                     <button
                       onClick={handleImageClick}
-                      className={`${styles.imageSize} bg-white/10 rounded-lg overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity`}
+                      className={`${styles.imageSize} bg-white/10 overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity`}
                       title="Click to view full size"
                     >
                       <img
@@ -302,10 +302,10 @@ export function TaskItem({
                     )}
                     {/* Show current badge after title for active step */}
                     {isActiveStep && (
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                      <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium flex-shrink-0 ${
                         mode === 'view' 
                           ? 'bg-green-500/20 text-green-400' 
-                          : 'bg-green-100 text-green-800'
+                          : 'bg-green-100 text-green-800 rounded-full'
                       }`}>
                         CURRENT
                       </span>
@@ -377,7 +377,7 @@ export function TaskItem({
                   e.stopPropagation();
                   onUndo();
                 }}
-                className="text-white/80 bg-white/10 hover:bg-white/20 cursor-pointer transition-colors px-3 py-1.5 text-xs font-medium rounded-md flex items-center justify-center gap-1.5 w-full"
+                className="text-white/80 bg-white/10 hover:bg-white/20 cursor-pointer transition-colors px-3 py-1.5 text-xs font-medium flex items-center justify-center gap-1.5 w-full"
                 title="Uncheck this step"
               >
                 <RotateCcw className="w-3 h-3 flex-shrink-0" />

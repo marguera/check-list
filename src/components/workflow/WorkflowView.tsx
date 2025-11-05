@@ -343,9 +343,9 @@ export function WorkflowView({
                       {progressPercentage}%
                     </span>
                   </div>
-                  <div className="w-full bg-white/20 rounded-full h-2">
+                  <div className="w-full bg-white/20 h-2">
                     <div
-                      className="bg-white h-2 rounded-full transition-all duration-300"
+                      className="bg-white h-2 transition-all duration-300"
                       style={{ width: `${progressPercentage}%` }}
                     />
                   </div>

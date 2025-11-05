@@ -23,7 +23,7 @@ export function MobileViewHeader({
             variant="outline"
             size="sm"
             onClick={onBack}
-            className="flex items-center gap-2 border-white/20 text-white !bg-transparent hover:bg-white/10"
+            className="flex items-center gap-2 border-white/20 text-white !bg-transparent hover:bg-white/10 !rounded-none"
           >
             <ArrowLeft className="w-4 h-4" />
             Back

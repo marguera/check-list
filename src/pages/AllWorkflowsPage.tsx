@@ -40,7 +40,7 @@ export function AllWorkflowsPage() {
           <p className="text-white/70 mb-6 px-4">Select a workflow to view and check tasks</p>
 
           {allWorkflows.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center border border-white/20 rounded-lg bg-white/5 mx-4">
+            <div className="flex flex-col items-center justify-center py-16 text-center border border-white/20 bg-white/5 mx-4">
               <ListTodo className="h-16 w-16 text-white/30 mb-4" />
               <h3 className="text-lg font-semibold text-white/60 uppercase mb-2">
                 No workflows yet
@@ -77,9 +77,9 @@ export function AllWorkflowsPage() {
                             {workflow.progressPercentage}%
                           </span>
                         </div>
-                        <div className="w-full bg-white/20 rounded-full h-2">
+                        <div className="w-full bg-white/20 h-2">
                           <div
-                            className="bg-white h-2 rounded-full transition-all duration-300"
+                            className="bg-white h-2 transition-all duration-300"
                             style={{ width: `${workflow.progressPercentage}%` }}
                           />
                         </div>

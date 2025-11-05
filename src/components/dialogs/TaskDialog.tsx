@@ -162,7 +162,7 @@ export function TaskDialog({
                   {isCompleted && (
                     <div className="mb-4 pb-4 border-b border-white/20">
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20">
+                        <div className="flex items-center justify-center w-8 h-8 bg-green-500/20">
                           <Check className="w-5 h-5 text-green-400" />
                         </div>
                         <div>
@@ -313,7 +313,7 @@ export function TaskDialog({
             <DialogFooter className="px-6 pb-6 pt-4 border-t border-white/20 bg-[#19191A]">
               <MobileViewContainer>
                 <div className="flex justify-end gap-2 w-full">
-                  <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/20 text-white hover:bg-white/10 !bg-transparent">
+                  <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/20 text-white hover:bg-white/10 !bg-transparent !rounded-none">
                     Cancel
                   </Button>
                   <Button

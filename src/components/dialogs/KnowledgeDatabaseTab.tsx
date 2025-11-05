@@ -56,10 +56,10 @@ export function KnowledgeDatabaseTab({
           {linkedItems.map((item) => (
             <div
               key={item.id}
-              className={`border rounded-lg p-4 transition-colors cursor-pointer ${
+              className={`border p-4 transition-colors cursor-pointer ${
                 isViewMode 
                   ? 'border-white/20 hover:bg-white/10' 
-                  : 'border-slate-200 hover:bg-slate-50'
+                  : 'border-slate-200 rounded-lg hover:bg-slate-50'
               }`}
               onClick={() => handleView(item)}
             >

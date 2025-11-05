@@ -105,7 +105,7 @@ export function TaskCompletionDialog({
 
           {/* Fixed footer */}
           <div className="border-t border-white/20 bg-[#19191A] px-4 sm:px-6 py-4 flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/20 text-white hover:bg-white/10">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/20 text-white hover:bg-white/10 !rounded-none">
               Cancel
             </Button>
             <Button

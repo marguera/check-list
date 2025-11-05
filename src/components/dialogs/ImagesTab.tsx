@@ -30,10 +30,10 @@ export function ImagesTab({ imageUrls, mode = 'edit' }: ImagesTabProps) {
           {imageUrls.map((url, index) => (
             <div
               key={index}
-              className={`border rounded-lg overflow-hidden transition-shadow cursor-pointer ${
+              className={`border overflow-hidden transition-shadow cursor-pointer ${
                 isViewMode 
                   ? 'border-white/20 hover:shadow-lg hover:shadow-white/10' 
-                  : 'border-slate-200 hover:shadow-md'
+                  : 'border-slate-200 rounded-lg hover:shadow-md'
               }`}
               onClick={() => setSelectedImage(url)}
             >
