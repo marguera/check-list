@@ -135,7 +135,7 @@ export function TaskDialog({
         <div className="w-full h-full flex flex-col">
           <DialogHeader className="px-0 pt-0 pb-0 border-0">
             <MobileViewHeader
-              title={mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : (isCompleted ? 'Completed Step' : '')}
+              title={mode === 'add' ? 'Add Task' : mode === 'edit' ? 'Edit Task' : (task ? `Step ${task.stepNumber}` : '')}
               onBack={() => onOpenChange(false)}
               showBackButton={true}
             />

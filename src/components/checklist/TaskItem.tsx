@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { Task, TaskImportance } from '../../types';
 import { Check, X, Upload, Flag, RotateCcw, Trash2 } from 'lucide-react';
-import { Dialog, DialogContent } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
+import { Button } from '../ui/button';
 
 interface TaskItemProps {
   task: Task;
@@ -37,6 +38,7 @@ export function TaskItem({
   onUndo,
 }: TaskItemProps) {
   const [fullImageOpen, setFullImageOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Get completion state from execution if available, otherwise false
@@ -285,9 +287,9 @@ export function TaskItem({
                         <Check className={`${styles.checkSize} text-green-600 flex-shrink-0`} />
                       </span>
                     )}
-                    {/* Show "Completed" text after title on larger screens */}
+                    {/* Show step number after title on larger screens */}
                     {mode === 'view' && completed && (
-                      <span className="text-xs sm:text-sm font-medium text-green-600 hidden sm:inline flex-shrink-0">Completed</span>
+                      <span className="text-xs sm:text-sm font-medium text-green-600 hidden sm:inline flex-shrink-0">step {task.stepNumber}</span>
                     )}
                   </div>
                   {task.description && (
@@ -319,7 +321,7 @@ export function TaskItem({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDelete();
+                          setDeleteConfirmOpen(true);
                         }}
                         className="transition-all p-1.5 rounded text-red-500 hover:text-red-700 hover:bg-red-50"
                         title="Delete task"
@@ -385,6 +387,37 @@ export function TaskItem({
                 className="w-full h-auto max-h-[90vh] object-contain"
               />
             </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Delete confirmation dialog */}
+      {mode === 'edit' && (
+        <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Task</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete "{task.title}"? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteConfirmOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  onDelete?.();
+                  setDeleteConfirmOpen(false);
+                }}
+              >
+                Delete
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}

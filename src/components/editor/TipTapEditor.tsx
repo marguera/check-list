@@ -274,7 +274,7 @@ export function TipTapEditor({
   ];
 
   return (
-    <div className="rounded-lg overflow-hidden focus:outline-none focus:ring-0 focus-visible:outline-none">
+    <div className="border border-slate-300 rounded-lg overflow-hidden focus:outline-none focus:ring-0 focus-visible:outline-none focus-within:ring-2 focus-within:ring-slate-500 focus-within:border-slate-500">
       {editable && (
         <div className="border-b border-slate-200 p-2 flex gap-2 flex-wrap">
           <div className="relative">
