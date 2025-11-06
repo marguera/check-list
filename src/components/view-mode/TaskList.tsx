@@ -23,7 +23,7 @@ export function ViewTaskList({
   onUndo,
 }: ViewTaskListProps) {
   // Helper to check if a task is non-highlighted (low importance)
-  const isNonHighlighted = (task: Task) => {
+  const isNonHighlighted = (task: Task): boolean => {
     return task.importance !== 'high';
   };
 
