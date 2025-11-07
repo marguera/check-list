@@ -1,21 +1,35 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Project, Task } from '../../types';
-import { MobileViewHeader } from '../ui/MobileViewHeader';
-import { MobileViewContainer } from '../ui/MobileViewContainer';
-import { ViewTaskList } from './TaskList';
-import { ViewTaskDialog } from './TaskDialog';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Project, Task } from "../../types";
+import { MobileViewHeader } from "../ui/MobileViewHeader";
+import { MobileViewContainer } from "../ui/MobileViewContainer";
+import { ViewTaskList } from "./TaskList";
+import { ViewTaskDialog } from "./TaskDialog";
 
 interface ViewWorkflowViewProps {
-  selectedWorkflow: Project['workflows'][0];
+  selectedWorkflow: Project["workflows"][0];
   knowledgeItems: any[];
   onBackToWorkflows?: () => void;
   // Execution-related props
-  getOrCreateWorkflowExecution?: (workflowId: string, workflowVersion: number) => any;
+  getOrCreateWorkflowExecution?: (
+    workflowId: string,
+    workflowVersion: number
+  ) => any;
   completeTaskInExecution?: (executionId: string, taskId: string) => void;
-  isTaskCompleted?: (workflowId: string, workflowVersion: number, taskId: string) => boolean;
-  getCompletedTaskIds?: (workflowId: string, workflowVersion: number) => string[];
-  undoLastCompletedTask?: (workflowId: string, workflowVersion: number, taskId?: string) => void;
+  isTaskCompleted?: (
+    workflowId: string,
+    workflowVersion: number,
+    taskId: string
+  ) => boolean;
+  getCompletedTaskIds?: (
+    workflowId: string,
+    workflowVersion: number
+  ) => string[];
+  undoLastCompletedTask?: (
+    workflowId: string,
+    workflowVersion: number,
+    taskId?: string
+  ) => void;
 }
 
 export function ViewWorkflowView({
@@ -36,20 +50,29 @@ export function ViewWorkflowView({
     if (onBackToWorkflows) {
       onBackToWorkflows();
     } else {
-      navigate('/');
+      navigate("/");
     }
   };
 
   const handleViewTaskDetails = (task: Task) => {
-    const latestTask = selectedWorkflow.tasks.find(t => t.id === task.id) || task;
+    const latestTask =
+      selectedWorkflow.tasks.find((t) => t.id === task.id) || task;
     setCurrentTask(latestTask);
     setTaskDialogOpen(true);
   };
 
   const handleCompleteTask = () => {
-    if (currentTask && selectedWorkflow && completeTaskInExecution && getOrCreateWorkflowExecution) {
+    if (
+      currentTask &&
+      selectedWorkflow &&
+      completeTaskInExecution &&
+      getOrCreateWorkflowExecution
+    ) {
       const workflowVersion = selectedWorkflow.version || 1;
-      const execution = getOrCreateWorkflowExecution(selectedWorkflow.id, workflowVersion);
+      const execution = getOrCreateWorkflowExecution(
+        selectedWorkflow.id,
+        workflowVersion
+      );
       completeTaskInExecution(execution.id, currentTask.id);
     }
   };
@@ -58,17 +81,25 @@ export function ViewWorkflowView({
   let completedTasks = 0;
   let completedIds: string[] = [];
   if (getCompletedTaskIds && selectedWorkflow.version) {
-    completedIds = getCompletedTaskIds(selectedWorkflow.id, selectedWorkflow.version);
+    completedIds = getCompletedTaskIds(
+      selectedWorkflow.id,
+      selectedWorkflow.version
+    );
     completedTasks = completedIds.length;
   }
-  const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const progressPercentage =
+    totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   // Find the current step (first incomplete task)
   let currentStepTaskId: string | null = null;
   if (isTaskCompleted && selectedWorkflow.version) {
-    const sortedTasks = [...selectedWorkflow.tasks].sort((a, b) => a.stepNumber - b.stepNumber);
+    const sortedTasks = [...selectedWorkflow.tasks].sort(
+      (a, b) => a.stepNumber - b.stepNumber
+    );
     for (const task of sortedTasks) {
-      if (!isTaskCompleted(selectedWorkflow.id, selectedWorkflow.version, task.id)) {
+      if (
+        !isTaskCompleted(selectedWorkflow.id, selectedWorkflow.version, task.id)
+      ) {
         currentStepTaskId = task.id;
         break;
       }
@@ -78,10 +109,14 @@ export function ViewWorkflowView({
   // Find the last completed task ID
   let lastCompletedTaskId: string | null = null;
   if (isTaskCompleted && selectedWorkflow.version && completedIds.length > 0) {
-    const sortedTasks = [...selectedWorkflow.tasks].sort((a, b) => a.stepNumber - b.stepNumber);
+    const sortedTasks = [...selectedWorkflow.tasks].sort(
+      (a, b) => a.stepNumber - b.stepNumber
+    );
     for (let i = sortedTasks.length - 1; i >= 0; i--) {
       const task = sortedTasks[i];
-      if (isTaskCompleted(selectedWorkflow.id, selectedWorkflow.version, task.id)) {
+      if (
+        isTaskCompleted(selectedWorkflow.id, selectedWorkflow.version, task.id)
+      ) {
         lastCompletedTaskId = task.id;
         break;
       }
@@ -89,49 +124,18 @@ export function ViewWorkflowView({
   }
 
   const handleUndo = () => {
-    if (undoLastCompletedTask && selectedWorkflow.version && lastCompletedTaskId) {
-      undoLastCompletedTask(selectedWorkflow.id, selectedWorkflow.version, lastCompletedTaskId);
+    if (
+      undoLastCompletedTask &&
+      selectedWorkflow.version &&
+      lastCompletedTaskId
+    ) {
+      undoLastCompletedTask(
+        selectedWorkflow.id,
+        selectedWorkflow.version,
+        lastCompletedTaskId
+      );
     }
   };
-
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  // Scroll to last completed task on initial load and when tasks are checked/unchecked
-  useEffect(() => {
-    if (!scrollContainerRef.current || !isTaskCompleted || !selectedWorkflow.version) {
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      const container = scrollContainerRef.current;
-      if (!container) return;
-
-      const sortedTasks = [...selectedWorkflow.tasks].sort((a, b) => a.stepNumber - b.stepNumber);
-      const lastCompletedTask = [...sortedTasks].reverse().find(
-        task => isTaskCompleted(selectedWorkflow.id, selectedWorkflow.version!, task.id)
-      );
-
-      if (!lastCompletedTask) return;
-
-      const taskElement = container.querySelector(`[data-task-id="${lastCompletedTask.id}"]`) as HTMLElement;
-      if (!taskElement) return;
-
-      const containerRect = container.getBoundingClientRect();
-      const elementRect = taskElement.getBoundingClientRect();
-      
-      const containerPadding = 16;
-      const currentScrollTop = container.scrollTop;
-      const relativeTop = elementRect.top - containerRect.top;
-      const scrollPosition = currentScrollTop + relativeTop - containerPadding;
-      
-      container.scrollTo({
-        top: Math.max(0, scrollPosition),
-        behavior: 'smooth'
-      });
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
-  }, [selectedWorkflow.id, selectedWorkflow.version, selectedWorkflow.tasks, isTaskCompleted]);
 
   return (
     <div className="w-full h-screen flex flex-col fixed inset-0 bg-[#19191A] text-white">
@@ -140,13 +144,15 @@ export function ViewWorkflowView({
         onBack={handleBackToWorkflows}
         showBackButton={true}
       />
-      
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto min-h-0 py-4">
+
+      <div className="flex-1 overflow-y-auto min-h-0 py-4">
         <MobileViewContainer>
           {selectedWorkflow.description && (
-            <p className="text-lg text-white/70 mb-4 px-4">{selectedWorkflow.description}</p>
+            <p className="text-lg text-white/70 mb-4 px-4">
+              {selectedWorkflow.description}
+            </p>
           )}
-          
+
           <div className="mb-6 px-4">
             <div className="flex items-center justify-between text-sm mb-1">
               <span className="text-white/70">
@@ -174,7 +180,7 @@ export function ViewWorkflowView({
             lastCompletedTaskId={lastCompletedTaskId}
             onUndo={handleUndo}
           />
-          
+
           <div className="min-h-screen" />
         </MobileViewContainer>
       </div>
@@ -187,15 +193,27 @@ export function ViewWorkflowView({
             setCurrentTask(null);
           }
         }}
-        task={currentTask ? (selectedWorkflow.tasks.find(t => t.id === currentTask.id) || currentTask) : null}
+        task={
+          currentTask
+            ? selectedWorkflow.tasks.find((t) => t.id === currentTask.id) ||
+              currentTask
+            : null
+        }
         knowledgeItems={knowledgeItems}
-        isCurrentStep={currentTask ? currentStepTaskId === currentTask.id : false}
-        isCompleted={currentTask && selectedWorkflow.version && isTaskCompleted
-          ? isTaskCompleted(selectedWorkflow.id, selectedWorkflow.version, currentTask.id)
-          : false}
+        isCurrentStep={
+          currentTask ? currentStepTaskId === currentTask.id : false
+        }
+        isCompleted={
+          currentTask && selectedWorkflow.version && isTaskCompleted
+            ? isTaskCompleted(
+                selectedWorkflow.id,
+                selectedWorkflow.version,
+                currentTask.id
+              )
+            : false
+        }
         onComplete={handleCompleteTask}
       />
     </div>
   );
 }
-
