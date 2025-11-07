@@ -3,7 +3,6 @@ import { useProjects } from '../../hooks/useProjects';
 import { FolderOpen, ListTodo } from 'lucide-react';
 import { MobileViewHeader } from '../../components/ui/MobileViewHeader';
 import { MobileViewContainer } from '../../components/ui/MobileViewContainer';
-import { Folder } from 'lucide-react';
 
 export function AllWorkflowsPage() {
   const { projects, getCompletedTaskIds } = useProjects();
