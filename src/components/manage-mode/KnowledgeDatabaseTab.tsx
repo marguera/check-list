@@ -37,8 +37,8 @@ export function ManageKnowledgeDatabaseTab({
   if (linkedItems.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <BookOpen className="h-12 w-12 mb-4 text-slate-300" />
-        <p className="text-slate-500">No knowledge items linked in instructions</p>
+        <BookOpen className="h-12 w-12 mb-4 text-white/30" />
+        <p className="text-white/60">No knowledge items linked in instructions</p>
       </div>
     );
   }
@@ -46,21 +46,21 @@ export function ManageKnowledgeDatabaseTab({
   return (
     <>
       <div className="space-y-4">
-        <div className="text-sm mb-4 text-slate-600">
+        <div className="text-sm mb-4 text-white/60 uppercase tracking-wide">
           {linkedItems.length} knowledge item{linkedItems.length !== 1 ? 's' : ''} referenced in instructions
         </div>
         <div className="space-y-3">
           {linkedItems.map((item) => (
             <div
               key={item.id}
-              className="border border-slate-200 rounded-lg hover:bg-slate-50 p-4 transition-colors cursor-pointer"
+              className="border border-white/10 rounded-lg p-4 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
               onClick={() => handleView(item)}
             >
-              <h3 className="font-semibold mb-2 transition-colors text-slate-900 hover:text-blue-600">
+              <h3 className="font-semibold mb-2 text-white hover:text-white/80 transition-colors">
                 {item.title}
               </h3>
               {item.description && (
-                <p className="text-sm text-slate-600">{item.description}</p>
+                <p className="text-sm text-white/70">{item.description}</p>
               )}
             </div>
           ))}

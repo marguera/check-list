@@ -87,21 +87,21 @@ export function ManageTaskDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 !bg-white flex flex-col p-0 !gap-0 [&>button]:hidden"
+        className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 !bg-[#19191A] flex flex-col p-0 !gap-0 [&>button]:hidden"
       >
-        <div className="w-full h-full flex flex-col bg-white">
-          <DialogHeader className="px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
+        <div className="w-full h-full flex flex-col bg-[#19191A] text-white">
+          <DialogHeader className="px-4 sm:px-6 py-4 border-b border-white/20 bg-[#1F1F20]">
             <div className="flex items-center gap-3">
               <Button
-                variant="outline"
+                variant="default"
                 size="sm"
                 onClick={() => onOpenChange(false)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-white/10 border border-white/20 text-white hover:bg-white/20"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </Button>
-              <DialogTitle className="text-lg font-semibold text-slate-900 flex-1">
+              <DialogTitle className="text-lg font-semibold text-white flex-1 uppercase tracking-wide">
                 {mode === 'add' ? 'Add Task' : 'Edit Task'}
               </DialogTitle>
             </div>
@@ -114,26 +114,26 @@ export function ManageTaskDialog({
             <div className="max-w-4xl mx-auto">
               <div className="space-y-6 mb-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                  <label className="text-sm font-semibold uppercase tracking-wide text-white/70 mb-2 block">
                     Title
                   </label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="w-full px-3 py-2 border border-white/20 rounded-md bg-[#1F1F20] text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40"
                     placeholder="Enter task title"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                  <label className="text-sm font-semibold uppercase tracking-wide text-white/70 mb-2 block">
                     Description
                   </label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="w-full px-3 py-2 border border-white/20 rounded-md bg-[#1F1F20] text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40"
                     placeholder="Enter task description"
                   />
                 </div>
@@ -152,12 +152,19 @@ export function ManageTaskDialog({
             </div>
           </div>
 
-          <DialogFooter className="px-6 pb-6 pt-4 border-t">
+          <DialogFooter className="px-6 pb-6 pt-4 border-t border-white/20 bg-[#1F1F20]">
             <div className="max-w-4xl mx-auto w-full flex justify-end gap-2">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                variant="default"
+                onClick={() => onOpenChange(false)}
+                className="bg-transparent border border-white/20 text-white hover:bg-white/10"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSave}>
+              <Button
+                onClick={handleSave}
+                className="bg-white text-[#19191A] hover:bg-white/90"
+              >
                 {mode === 'add' ? 'Add Task' : 'Save Changes'}
               </Button>
             </div>

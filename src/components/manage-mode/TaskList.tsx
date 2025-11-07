@@ -93,14 +93,14 @@ interface AddTaskButtonProps {
 
 function AddTaskButton({ onClick }: AddTaskButtonProps) {
   return (
-    <div className="flex justify-center my-1">
+    <div className="flex justify-center my-2">
       <button
         onClick={onClick}
-        className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white/60 hover:text-white transition-colors bg-white/5 hover:bg-white/10 rounded-full"
         title="Add task"
       >
         <Plus className="w-3.5 h-3.5" />
-        <span>add task</span>
+        <span className="uppercase">add task</span>
       </button>
     </div>
   );

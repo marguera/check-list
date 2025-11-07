@@ -84,7 +84,7 @@ export function InstructionsTab({
       <>
         <div className="space-y-4">
           <div>
-            <div className="prose prose-sm max-w-none">
+            <div className="prose prose-sm max-w-none text-white">
               <div 
                 ref={instructionsRef}
                 className="instructions-content"
@@ -116,51 +116,26 @@ export function InstructionsTab({
                 outline: none !important;
                 border: none !important;
               }
-              .instructions-content h1 {
-                font-size: 2em;
-                font-weight: bold;
-                margin: 0.67em 0;
-                line-height: 1.2;
-                color: #0f172a;
-              }
-              .instructions-content h2 {
-                font-size: 1.5em;
+              .instructions-content h1,
+              .instructions-content h2,
+              .instructions-content h3,
+              .instructions-content h4,
+              .instructions-content h5,
+              .instructions-content h6 {
                 font-weight: bold;
                 margin: 0.75em 0;
                 line-height: 1.3;
-                color: #0f172a;
+                color: #f8fafc;
               }
-              .instructions-content h3 {
-                font-size: 1.17em;
-                font-weight: bold;
-                margin: 0.83em 0;
-                line-height: 1.4;
-                color: #0f172a;
-              }
-              .instructions-content h4 {
-                font-size: 1em;
-                font-weight: bold;
-                margin: 1em 0;
-                line-height: 1.5;
-                color: #0f172a;
-              }
-              .instructions-content h5 {
-                font-size: 0.83em;
-                font-weight: bold;
-                margin: 1.17em 0;
-                line-height: 1.5;
-                color: #0f172a;
-              }
-              .instructions-content h6 {
-                font-size: 0.67em;
-                font-weight: bold;
-                margin: 1.33em 0;
-                line-height: 1.5;
-                color: #0f172a;
-              }
+              .instructions-content h1 { font-size: 2em; }
+              .instructions-content h2 { font-size: 1.5em; }
+              .instructions-content h3 { font-size: 1.17em; }
+              .instructions-content h4 { font-size: 1em; }
+              .instructions-content h5 { font-size: 0.83em; }
+              .instructions-content h6 { font-size: 0.67em; }
               .instructions-content p {
                 margin: 0.5em 0;
-                color: #334155;
+                color: #e2e8f0;
               }
               .instructions-content img {
                 max-width: 100%;
@@ -186,17 +161,17 @@ export function InstructionsTab({
                 margin-bottom: 1em;
               }
               .instructions-content a[data-knowledge-link] {
-                color: #2563eb;
+                color: #93c5fd;
                 text-decoration: underline;
                 cursor: pointer;
                 pointer-events: auto;
               }
               .instructions-content a[data-knowledge-link]:hover {
-                color: #1d4ed8;
+                color: #bfdbfe;
                 text-decoration: underline;
               }
               .instructions-content a:not([data-knowledge-link]) {
-                color: #2563eb;
+                color: #93c5fd;
                 text-decoration: underline;
               }
               .instructions-content ul,
@@ -235,9 +210,9 @@ export function InstructionsTab({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-white">
       <div>
-        <label className="text-sm font-medium text-slate-700 mb-2 block">
+        <label className="text-sm font-semibold uppercase tracking-wide text-white/70 mb-2 block">
           Instructions
         </label>
         <TipTapEditor

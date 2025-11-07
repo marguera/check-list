@@ -32,22 +32,22 @@ export function ManageTaskItem({
     switch (importance) {
       case 'high':
         return {
-          title: 'text-2xl font-bold',
-          description: 'text-base',
-          border: 'border border-slate-200',
+          title: 'text-lg font-semibold uppercase',
+          description: 'text-sm',
+          container: 'bg-white/10 border border-white/20 hover:bg-white/15',
           padding: 'p-5',
-          background: 'bg-amber-100',
           imageSize: 'w-16 h-16 sm:w-24 sm:h-24',
+          imageFrame: 'bg-white/10',
         };
       case 'low':
       default:
         return {
-          title: 'text-lg font-semibold',
+          title: 'text-base font-semibold uppercase',
           description: 'text-sm',
-          border: 'border border-slate-200',
+          container: 'bg-white/5 border border-white/10 hover:bg-white/10',
           padding: 'p-4',
-          background: 'bg-white',
           imageSize: 'w-16 h-16 sm:w-24 sm:h-24',
+          imageFrame: 'bg-white/5',
         };
     }
   };
@@ -56,7 +56,7 @@ export function ManageTaskItem({
 
   // Build container classes - card style for manage mode
   const getContainerClasses = () => {
-    const baseClasses = `mb-4 ${styles.background} ${styles.border} rounded-lg hover:shadow-md ${styles.padding}`;
+    const baseClasses = `mb-4 rounded-lg transition-colors ${styles.container} ${styles.padding}`;
     return baseClasses;
   };
 
@@ -95,12 +95,12 @@ export function ManageTaskItem({
     <>
       <div
         data-task-id={task.id}
-        className={`transition-all ${getContainerClasses()} ${isDragging ? 'opacity-50' : ''}`}
+        className={`transition-all ${getContainerClasses()} ${isDragging ? 'opacity-50 scale-[0.99]' : ''}`}
       >
         <div className="flex flex-col">
           {/* Step Number */}
-          <div className="font-semibold text-xs sm:text-sm mb-1 text-slate-600">
-            STEP {task.stepNumber}
+          <div className="font-semibold text-xs sm:text-sm mb-2 text-white/60 tracking-wide uppercase">
+            Step {task.stepNumber}
           </div>
           
           {/* Main content row (image + content) */}
@@ -109,7 +109,7 @@ export function ManageTaskItem({
             {task.imageUrl ? (
               <div className="flex-shrink-0">
                 <div className="relative group">
-                  <div className={`${styles.imageSize} bg-slate-100 rounded-lg overflow-hidden relative`}>
+                  <div className={`${styles.imageSize} ${styles.imageFrame} rounded-lg overflow-hidden relative border border-white/10`}>
                     <img
                       src={task.imageUrl}
                       alt={task.title}
@@ -117,14 +117,14 @@ export function ManageTaskItem({
                     />
                     <button
                       onClick={handleRemoveImage}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/90"
                       title="Remove image"
                     >
                       <X className="w-3 h-3" />
                     </button>
                     <button
                       onClick={handleUploadClick}
-                      className="absolute top-1 left-1 bg-blue-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-600"
+                      className="absolute top-1 left-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/90"
                       title="Replace image"
                     >
                       <Upload className="w-3 h-3" />
@@ -136,11 +136,11 @@ export function ManageTaskItem({
               <div className="flex-shrink-0">
                 <button
                   onClick={handleUploadClick}
-                  className={`${styles.imageSize} bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-100 transition-all flex flex-col items-center justify-center gap-1.5 text-slate-600 hover:text-slate-700 group`}
+                  className={`${styles.imageSize} border-2 border-dashed border-white/20 rounded-lg bg-white/5 hover:border-white/40 hover:bg-white/10 transition-all flex flex-col items-center justify-center gap-1.5 text-white/60 hover:text-white group`}
                   title="Add image"
                 >
                   <Upload className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-medium">Add Image</span>
+                  <span className="text-xs font-medium uppercase">Add Image</span>
                 </button>
               </div>
             )}
@@ -158,12 +158,12 @@ export function ManageTaskItem({
               <div className="flex items-start justify-between mb-2 gap-1 sm:gap-2">
                 <div className="flex-1 min-w-0">
                   <div className={`flex items-center gap-2 flex-wrap ${task.description ? 'mb-1' : ''}`}>
-                    <h3 className={`${styles.title} m-0 inline-block align-middle text-slate-900 break-words`}>
+                    <h3 className={`${styles.title} m-0 inline-block align-middle text-white break-words` }>
                       {task.title}
                     </h3>
                   </div>
                   {task.description && (
-                    <p className={`${styles.description} line-clamp-2 text-slate-600`}>
+                    <p className={`${styles.description} line-clamp-2 text-white/70`}>
                       {task.description}
                     </p>
                   )}
@@ -174,8 +174,8 @@ export function ManageTaskItem({
                       onClick={handleImportanceToggle}
                       className={`transition-all p-1.5 rounded ${
                         importance === 'high'
-                          ? 'text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100'
-                          : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                          ? 'text-amber-300 hover:text-amber-200 bg-white/10 hover:bg-white/20'
+                          : 'text-white/50 hover:text-white bg-white/5 hover:bg-white/10'
                       }`}
                       title={importance === 'high' ? 'High importance (click to remove)' : 'Click to highlight as important'}
                     >
@@ -188,7 +188,7 @@ export function ManageTaskItem({
                         e.stopPropagation();
                         setDeleteConfirmOpen(true);
                       }}
-                      className="transition-all p-1.5 rounded text-red-500 hover:text-red-700 hover:bg-red-50"
+                      className="transition-all p-1.5 rounded text-red-400 hover:text-red-200 hover:bg-red-500/20"
                       title="Delete task"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -201,7 +201,7 @@ export function ManageTaskItem({
                   e.stopPropagation();
                   onEdit();
                 }}
-                className="text-sm font-medium underline text-blue-600 hover:text-blue-700"
+                className="text-sm font-semibold uppercase tracking-wide text-white/80 underline underline-offset-4 hover:text-white"
               >
                 Add/Edit Details
               </button>
@@ -212,10 +212,10 @@ export function ManageTaskItem({
 
       {/* Delete confirmation dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent>
+        <DialogContent className="bg-[#1F1F20] text-white border border-white/10">
           <DialogHeader>
-            <DialogTitle>Delete Task</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white">Delete Task</DialogTitle>
+            <DialogDescription className="text-white/70">
               Are you sure you want to delete "{task.title}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -223,6 +223,7 @@ export function ManageTaskItem({
             <Button
               variant="outline"
               onClick={() => setDeleteConfirmOpen(false)}
+              className="bg-transparent border border-white/20 text-white hover:bg-white/10"
             >
               Cancel
             </Button>

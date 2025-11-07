@@ -54,32 +54,37 @@ export function KnowledgeBaseView({
     setViewingItem(item);
     setViewerOpen(true);
   };
-
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Knowledge Base</h1>
-          <p className="text-slate-600">
+          <h1 className="text-3xl font-bold uppercase text-white">Knowledge Base</h1>
+          <p className="text-white/70 max-w-2xl">
             Manage your knowledge base items that can be linked to tasks
           </p>
         </div>
-        <Button onClick={handleAdd} className="flex items-center gap-2">
+        <Button
+          onClick={handleAdd}
+          className="flex items-center gap-2 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+        >
           <Plus className="w-4 h-4" />
           Add Item
         </Button>
       </div>
 
       {knowledgeItems.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center border border-slate-200 rounded-lg bg-slate-50">
-          <BookOpen className="h-16 w-16 text-slate-300 mb-4" />
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+        <div className="flex flex-col items-center justify-center py-16 text-center border border-white/10 rounded-lg bg-white/5">
+          <BookOpen className="h-16 w-16 text-white/30 mb-4" />
+          <h3 className="text-lg font-semibold text-white mb-2">
             No knowledge items yet
           </h3>
-          <p className="text-slate-600 mb-4">
+          <p className="text-white/60 mb-4">
             Get started by adding your first knowledge base item
           </p>
-          <Button onClick={handleAdd} className="flex items-center gap-2">
+          <Button
+            onClick={handleAdd}
+            className="flex items-center gap-2 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+          >
             <Plus className="w-4 h-4" />
             Add First Item
           </Button>
@@ -89,10 +94,10 @@ export function KnowledgeBaseView({
           {knowledgeItems.map((item) => (
             <div
               key={item.id}
-              className="border border-slate-200 rounded-lg p-5 bg-white hover:shadow-md transition-shadow"
+              className="border border-white/10 rounded-lg p-5 bg-white/5 hover:bg-white/10 transition-colors"
             >
-              <div className="flex items-start justify-between">
-                <div 
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div
                   className="flex-1 cursor-pointer"
                   onClick={() => handleView(item)}
                   onKeyDown={(e) => {
@@ -104,22 +109,22 @@ export function KnowledgeBaseView({
                   role="button"
                   tabIndex={0}
                 >
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2 hover:text-blue-600 transition-colors">
+                  <h3 className="text-xl font-semibold text-white mb-2 hover:text-white/80 transition-colors">
                     {item.title}
                   </h3>
                   {item.description && (
-                    <p className="text-slate-600">{item.description}</p>
+                    <p className="text-white/70">{item.description}</p>
                   )}
                 </div>
-                <div 
-                  className="flex gap-2 ml-4"
+                <div
+                  className="flex flex-wrap gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={() => handleEdit(item)}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 text-white bg-white/5 border border-white/10 hover:bg-white/15"
                   >
                     <Edit className="w-4 h-4" />
                     Edit
