@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
-import { ListTodo } from 'lucide-react';
+import { FolderOpen, ListTodo } from 'lucide-react';
 import { MobileViewHeader } from '../../components/ui/MobileViewHeader';
 import { MobileViewContainer } from '../../components/ui/MobileViewContainer';
+import { Folder } from 'lucide-react';
 
 export function AllWorkflowsPage() {
   const { projects, getCompletedTaskIds } = useProjects();
@@ -17,7 +18,7 @@ export function AllWorkflowsPage() {
       const completedTaskIds = getCompletedTaskIds ? getCompletedTaskIds(workflow.id, workflowVersion) : [];
       const completedTasks = completedTaskIds.length;
       const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-      
+
       return {
         ...workflow,
         projectTitle: project.title,
@@ -32,13 +33,11 @@ export function AllWorkflowsPage() {
   return (
     <div className="w-full h-screen flex flex-col fixed inset-0 bg-[#19191A] text-white">
       {/* Header matching dialog style - full width */}
-      <MobileViewHeader title="Workflows" />
-      
+      <MobileViewHeader title="Workflows: Select a workflow to view and check tasks" />
+
       {/* Scrollable content area */}
       <div className="flex-1 overflow-y-auto min-h-0 py-4">
         <MobileViewContainer>
-          <p className="text-white/70 mb-6 px-4">Select a workflow to view and check tasks</p>
-
           {allWorkflows.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center border border-white/20 bg-white/5 mx-4">
               <ListTodo className="h-16 w-16 text-white/30 mb-4" />
@@ -59,14 +58,18 @@ export function AllWorkflowsPage() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm text-white/60 mb-1">{workflow.projectTitle}</div>
-                      <h3 className="text-lg font-semibold text-white/60 uppercase mb-2">
+                      <div className="mb-1">
+                        <span data-slot="badge" className="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-sm w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 [&>svg]:pointer-events-none overflow-hidden border-transparent gap-1.5 bg-blue-500/10 text-blue-400">
+                          <FolderOpen size={24} className="text-blue-500" /> {workflow.projectTitle}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-semibold text-white uppercase">
                         {workflow.title}
                       </h3>
                       {workflow.description && (
-                        <p className="text-white/70 mb-3 line-clamp-2">{workflow.description}</p>
+                        <p className="text-sm text-white/70 mb-3 line-clamp-2">{workflow.description}</p>
                       )}
-                      
+
                       {/* Progress Bar */}
                       <div>
                         <div className="flex items-center justify-between text-sm mb-1">

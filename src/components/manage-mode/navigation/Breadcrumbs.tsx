@@ -19,10 +19,10 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
   const homePath = location.pathname.startsWith('/knowledge') ? '/knowledge' : '/projects';
 
   return (
-    <nav className="flex items-center space-x-2 text-sm text-slate-600 mb-6" aria-label="Breadcrumb">
+    <nav className="flex items-center space-x-2 text-sm text-white/60 mb-6" aria-label="Breadcrumb">
       <Link
         to={homePath}
-        className="flex items-center hover:text-slate-900 transition-colors"
+        className="flex items-center hover:text-white transition-colors"
       >
         <Home className="w-4 h-4" />
       </Link>
@@ -31,13 +31,13 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
 
         return (
           <div key={index} className="flex items-center space-x-2">
-            <ChevronRight className="w-4 h-4 text-slate-400" />
+            <ChevronRight className="w-4 h-4 text-white/40" />
             {isActive ? (
-              <span className="text-slate-900 font-medium">{item.label}</span>
+              <span className="text-white font-semibold uppercase tracking-wide">{item.label}</span>
             ) : (
               <Link
                 to={item.path}
-                className="hover:text-slate-900 transition-colors"
+                className="hover:text-white transition-colors"
               >
                 {item.label}
               </Link>

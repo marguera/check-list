@@ -33,10 +33,10 @@ export function KnowledgeLinkDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl bg-[#1F1F20] text-white border border-white/20">
         <DialogHeader>
-          <DialogTitle>Select Knowledge Item</DialogTitle>
-          <DialogDescription>Choose a knowledge item to link</DialogDescription>
+          <DialogTitle className="text-white uppercase tracking-wide">Select Knowledge Item</DialogTitle>
+          <DialogDescription className="text-white/70">Choose a knowledge item to link</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <input
@@ -44,11 +44,11 @@ export function KnowledgeLinkDialog({
             placeholder="Search knowledge items..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
+            className="w-full px-3 py-2 border border-white/20 rounded-md bg-[#19191A] text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40"
           />
-          <div className="max-h-96 overflow-y-auto space-y-2">
+          <div className="max-h-96 overflow-y-auto space-y-2 pr-1">
             {filteredItems.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">
+              <p className="text-center text-white/50 py-8">
                 No knowledge items found
               </p>
             ) : (
@@ -60,19 +60,23 @@ export function KnowledgeLinkDialog({
                     onOpenChange(false);
                     setSearchTerm('');
                   }}
-                  className="w-full text-left border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors"
+                  className="w-full text-left border border-white/10 rounded-lg p-4 bg-white/5 hover:bg-white/10 transition-colors"
                 >
-                  <h3 className="font-semibold text-slate-900 mb-1">
+                  <h3 className="font-semibold text-white mb-1">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-slate-600">{item.description}</p>
+                  <p className="text-sm text-white/70">{item.description}</p>
                 </button>
               ))
             )}
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="default"
+            onClick={() => onOpenChange(false)}
+            className="bg-transparent border border-white/20 text-white hover:bg-white/10"
+          >
             Cancel
           </Button>
         </DialogFooter>

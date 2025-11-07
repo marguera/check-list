@@ -49,14 +49,14 @@ export function ManageTaskDetailsContent({
   const gridCols = tabCount === 1 ? 'grid-cols-1' : tabCount === 2 ? 'grid-cols-2' : 'grid-cols-3';
 
   return (
-    <div className="space-y-6 mb-4">
+    <div className="space-y-6 mb-4 text-white">
       {/* Title and Description */}
       <div>
-        <h2 className="text-2xl font-semibold mb-2 text-slate-900">
+        <h2 className="text-2xl font-semibold mb-2 uppercase">
           {task.title || 'Untitled Task'}
         </h2>
         {task.description && (
-          <p className="text-base leading-relaxed whitespace-pre-wrap text-slate-700">
+          <p className="text-base leading-relaxed whitespace-pre-wrap text-white/80">
             {task.description}
           </p>
         )}
@@ -65,22 +65,22 @@ export function ManageTaskDetailsContent({
       {/* Tabs for Instructions, Knowledge Database, and Images */}
       {tabCount > 0 && (
         <Tabs defaultValue={hasInstructions ? "instructions" : (hasKnowledgeLinks ? "knowledge" : "images")} className="w-full">
-          <TabsList className={`grid w-full ${gridCols}`}>
+          <TabsList className={`grid w-full ${gridCols} bg-white/10 text-white/70 !rounded-none`}>
             {hasInstructions && (
-              <TabsTrigger value="instructions" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="instructions" className="flex items-center justify-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:text-white !rounded-none">
                 <Info className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Instructions</span>
               </TabsTrigger>
             )}
             {hasKnowledgeLinks && (
-              <TabsTrigger value="knowledge" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="knowledge" className="flex items-center justify-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:text-white !rounded-none">
                 <BookOpen className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Knowledge Database ({getAllKnowledgeLinks().length})</span>
                 <span className="sm:hidden">({getAllKnowledgeLinks().length})</span>
               </TabsTrigger>
             )}
             {hasImages && (
-              <TabsTrigger value="images" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="images" className="flex items-center justify-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:text-white !rounded-none">
                 <ImageIcon className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Images ({imageUrls.length})</span>
                 <span className="sm:hidden">({imageUrls.length})</span>

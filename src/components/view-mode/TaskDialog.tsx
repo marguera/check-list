@@ -51,7 +51,7 @@ export function ViewTaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         className="!max-w-full !w-full !h-full !max-h-screen !m-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 !border-0 flex flex-col p-0 !gap-0 [&>button]:hidden !bg-[#19191A]"
         onOpenAutoFocus={(e) => {
           e.preventDefault();
@@ -90,7 +90,7 @@ export function ViewTaskDialog({
                       </div>
                     </div>
                   )}
-                  
+
                   <ViewTaskDetailsContent
                     task={task}
                     knowledgeItems={knowledgeItems}
@@ -102,7 +102,7 @@ export function ViewTaskDialog({
                       setSelectedImage(imageUrl);
                     }}
                   />
-                  
+
                   {/* Confirmation Checkbox - only show for current incomplete step */}
                   {!isCompleted && isCurrentStep && onComplete && (
                     <div className="pt-6 mt-6 border-t border-white/20 pb-4">
@@ -128,12 +128,12 @@ export function ViewTaskDialog({
               )}
             </MobileViewContainer>
           </div>
-          
+
           {!isCompleted && isCurrentStep && onComplete && (
             <DialogFooter className="px-6 pb-6 pt-4 border-t border-white/20 bg-[#19191A]">
               <MobileViewContainer>
                 <div className="flex justify-end gap-2 w-full">
-                  <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/20 text-white hover:bg-white/10 !bg-transparent !rounded-none">
+                  <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/20 !text-white !bg-transparent hover:!bg-blue-500/10 ">
                     Cancel
                   </Button>
                   <Button
