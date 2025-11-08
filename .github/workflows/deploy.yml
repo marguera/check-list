@@ -34,17 +34,47 @@ jobs:
       - name: Generate config.json from secrets
         run: |
           mkdir -p public
-          echo '{
-            "llm": {
-              "provider": "${{ secrets.LLM_PROVIDER || "gemini" }}",
-              "model": "${{ secrets.LLM_MODEL || "gemini-1.5-flash" }}",
-              "apiKey": "${{ secrets.LLM_API_KEY || "" }}"
+          PROVIDER="${{ secrets.LLM_PROVIDER }}"
+          MODEL="${{ secrets.LLM_MODEL }}"
+          API_KEY="${{ secrets.LLM_API_KEY }}"
+          PROVIDER=${PROVIDER:-gemini}
+          MODEL=${MODEL:-gemini-1.5-flash}
+          API_KEY=${API_KEY:-}
+          echo "{
+            \"llm\": {
+              \"provider\": \"${PROVIDER}\",
+              \"model\": \"${MODEL}\",
+              \"apiKey\": \"${API_KEY}\"
             }
-          }' > public/config.json
+          }" > public/config.json
+          echo "Generated config.json:"
+          cat public/config.json
         shell: bash
       
       - name: Build
-        run: npm run build
+        run: |
+          echo "Building application..."
+          npm run build 2>&1 | tee build.log || {
+            echo "Build failed! Checking logs..."
+            cat build.log
+            exit 1
+          }
+          echo "Build completed successfully"
+      
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Error: dist directory not found"
+            exit 1
+          fi
+          if [ ! -f "dist/index.html" ]; then
+            echo "Error: dist/index.html not found"
+            exit 1
+          fi
+          echo "Build output verified:"
+          ls -lah dist/
+          echo "Checking for config.json:"
+          ls -lah dist/config.json || echo "Warning: config.json not found in dist"
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
