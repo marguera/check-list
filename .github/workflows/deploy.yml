@@ -38,7 +38,7 @@ jobs:
           MODEL="${{ secrets.LLM_MODEL }}"
           API_KEY="${{ secrets.LLM_API_KEY }}"
           PROVIDER=${PROVIDER:-gemini}
-          MODEL=${MODEL:-gemini-1.5-flash}
+          MODEL=${MODEL:-gemini-1.5-pro}
           API_KEY=${API_KEY:-}
           echo "{
             \"llm\": {
