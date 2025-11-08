@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project, Task, TaskImportance } from '../../types';
 import { Button } from '../ui/button';
@@ -7,8 +7,6 @@ import { WorkflowDialog } from './workflow/WorkflowDialog';
 import { ManageTaskList } from './TaskList';
 import { ManageTaskDialog } from './TaskDialog';
 import { PreviewDialog } from './PreviewDialog';
-import { MobileViewHeader } from '../ui/MobileViewHeader';
-import { MobileViewContainer } from '../ui/MobileViewContainer';
 
 interface ManageWorkflowViewProps {
   project: Project;
@@ -45,8 +43,33 @@ export function ManageWorkflowView({
   const [taskDialogMode, setTaskDialogMode] = useState<'add' | 'edit'>('add');
   const [insertIndex, setInsertIndex] = useState<number | null>(null);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const pendingImportTasks = useRef<{ workflowTitle: string; workflowDescription: string; tasks: Task[] } | null>(null);
 
   const actualSelectedWorkflow = selectedWorkflowProp || localSelectedWorkflow;
+
+  // Handle pending workflow imports
+  useEffect(() => {
+    if (pendingImportTasks.current) {
+      const { workflowTitle, workflowDescription, tasks } = pendingImportTasks.current;
+      // Find the workflow that matches and has no tasks
+      const targetWorkflow = project.workflows.find(
+        w => w.title === workflowTitle && 
+        w.description === workflowDescription &&
+        w.tasks.length === 0
+      );
+      
+      if (targetWorkflow) {
+        const tasksWithIds = tasks.map((task, index) => ({
+          ...task,
+          id: `task-${Date.now()}-${index}`,
+          workflowId: targetWorkflow.id,
+          stepNumber: index + 1,
+        }));
+        onUpdateWorkflow(project.id, targetWorkflow.id, { tasks: tasksWithIds });
+        pendingImportTasks.current = null;
+      }
+    }
+  }, [project.workflows, project.id, onUpdateWorkflow]);
 
   const handleBackNavigation = () => {
     if (actualSelectedWorkflow) {
@@ -80,10 +103,27 @@ export function ManageWorkflowView({
 
   const handleSave = (workflowData: Partial<Project['workflows'][0]>) => {
     if (dialogMode === 'add') {
-      onAddWorkflow({
-        title: workflowData.title || '',
-        description: workflowData.description || '',
-      });
+      // Check if tasks are provided (import case)
+      if (workflowData.tasks && workflowData.tasks.length > 0) {
+        // Create workflow first
+        onAddWorkflow({
+          title: workflowData.title || '',
+          description: workflowData.description || '',
+        });
+        
+        // Store tasks to be added after workflow is created
+        pendingImportTasks.current = {
+          workflowTitle: workflowData.title || '',
+          workflowDescription: workflowData.description || '',
+          tasks: workflowData.tasks,
+        };
+      } else {
+        // Normal create without tasks
+        onAddWorkflow({
+          title: workflowData.title || '',
+          description: workflowData.description || '',
+        });
+      }
     } else if (currentWorkflow) {
       onUpdateWorkflow(project.id, currentWorkflow.id, workflowData);
     }
@@ -201,85 +241,79 @@ export function ManageWorkflowView({
     onUpdateWorkflow(project.id, actualSelectedWorkflow.id, { tasks: updatedWorkflow.tasks });
   };
 
-  const headerTitle = actualSelectedWorkflow
-    ? `Workflow: ${actualSelectedWorkflow.title}`
-    : `Project: ${project.title}`;
-
   return (
-    <div className="w-full h-screen flex flex-col fixed inset-0 bg-[#19191A] text-white">
-      <MobileViewHeader
-        title={headerTitle}
-        onBack={handleBackNavigation}
-        showBackButton={Boolean(actualSelectedWorkflow)}
-      >
-        {actualSelectedWorkflow ? (
-          <Button
-            onClick={() => setPreviewDialogOpen(true)}
-            size="sm"
-            className="bg-white/10 border border-white/10 text-white hover:bg-white/20 hover:text-white"
-          >
-            Preview
-          </Button>
-        ) : (
-          <Button
-            onClick={handleAdd}
-            size="sm"
-            className="bg-white/10 border border-white/10 text-white hover:bg-white/20 hover:text-white flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Add Workflow
-          </Button>
-        )}
-      </MobileViewHeader>
-
-      <div className="flex-1 overflow-y-auto min-h-0 py-4">
-        <MobileViewContainer className="px-4">
-          {actualSelectedWorkflow ? (
-            <div className="space-y-6">
+    <div className="space-y-6">
+      {actualSelectedWorkflow ? (
+        <>
+          {/* Task List View Header */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold uppercase text-white">{actualSelectedWorkflow.title}</h1>
               {actualSelectedWorkflow.description && (
-                <p className="text-white/70 text-base">
+                <p className="text-white/70 max-w-2xl mt-2">
                   {actualSelectedWorkflow.description}
                 </p>
               )}
-
-              <ManageTaskList
-                tasks={actualSelectedWorkflow.tasks}
-                onTaskEdit={handleViewTaskDetails}
-                onTaskDelete={handleDeleteTask}
-                onTaskImageUpdate={handleTaskImageUpdate}
-                onTaskImportanceChange={handleTaskImportanceChange}
-                onReorderTasks={handleReorderTasks}
-                onInsertTask={handleInsertTask}
-              />
             </div>
-          ) : (
-            <div className="space-y-6">
+            <Button
+              onClick={() => setPreviewDialogOpen(true)}
+              className="flex items-center gap-2 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+            >
+              Preview
+            </Button>
+          </div>
+
+          <ManageTaskList
+            tasks={actualSelectedWorkflow.tasks}
+            onTaskEdit={handleViewTaskDetails}
+            onTaskDelete={handleDeleteTask}
+            onTaskImageUpdate={handleTaskImageUpdate}
+            onTaskImportanceChange={handleTaskImportanceChange}
+            onReorderTasks={handleReorderTasks}
+            onInsertTask={handleInsertTask}
+          />
+        </>
+      ) : (
+        <>
+          {/* Workflows List View Header */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold uppercase text-white">{project.title}</h1>
               {project.description && (
-                <p className="text-white/70 text-base">
+                <p className="text-white/70 max-w-2xl mt-2">
                   {project.description}
                 </p>
               )}
+            </div>
+            <Button
+              onClick={handleAdd}
+              className="flex items-center gap-2 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+            >
+              <Plus className="w-4 h-4" />
+              Add Workflow
+            </Button>
+          </div>
 
-              {project.workflows.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center border border-white/10 rounded-lg bg-white/5">
-                  <ListTodo className="h-16 w-16 text-white/30 mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    No workflows yet
-                  </h3>
-                  <p className="text-white/60 mb-4">
-                    Get started by creating your first workflow
-                  </p>
-                  <Button
-                    onClick={handleAdd}
-                    className="flex items-center gap-2 bg-white/10 border border-white/10 text-white hover:bg-white/20 hover:text-white"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create First Workflow
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {project.workflows.map((workflow) => (
+          {project.workflows.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center border border-white/10 rounded-lg bg-white/5">
+              <ListTodo className="h-16 w-16 text-white/30 mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">
+                No workflows yet
+              </h3>
+              <p className="text-white/60 mb-4">
+                Get started by creating your first workflow
+              </p>
+              <Button
+                onClick={handleAdd}
+                className="flex items-center gap-2 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+              >
+                <Plus className="w-4 h-4" />
+                Create First Workflow
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {project.workflows.map((workflow) => (
                     <div
                       key={workflow.id}
                       className="border border-white/10 rounded-lg p-5 bg-white/5 hover:bg-white/10 transition-colors"
@@ -330,10 +364,8 @@ export function ManageWorkflowView({
                   ))}
                 </div>
               )}
-            </div>
+            </>
           )}
-        </MobileViewContainer>
-      </div>
 
       {actualSelectedWorkflow && (
         <ManageTaskDialog
@@ -367,6 +399,15 @@ export function ManageWorkflowView({
         workflow={currentWorkflow}
         onSave={handleSave}
         mode={dialogMode}
+        knowledgeItems={knowledgeItems}
+        projectId={project.id}
+        onImportWorkflow={(workflowData, tasks) => {
+          // Use handleSave which will create workflow and update with tasks
+          handleSave({
+            ...workflowData,
+            tasks,
+          });
+        }}
       />
     </div>
   );

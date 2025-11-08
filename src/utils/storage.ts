@@ -53,9 +53,29 @@ export const loadKnowledgeItems = (): KnowledgeItem[] | null => {
 
 export const saveProjects = (projects: Project[]): void => {
   try {
-    localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
-  } catch (error) {
+    const data = JSON.stringify(projects);
+    localStorage.setItem(PROJECTS_STORAGE_KEY, data);
+  } catch (error: any) {
     console.error('Error saving projects:', error);
+    
+    // If it's a quota exceeded error, provide helpful feedback
+    if (error.name === 'QuotaExceededError' || error.code === 22) {
+      const dataSize = JSON.stringify(projects).length;
+      const sizeInMB = (dataSize / (1024 * 1024)).toFixed(2);
+      console.error(
+        `Storage quota exceeded. Total data size: ${sizeInMB}MB. ` +
+        `Consider removing some workflows or compressing images further.`
+      );
+      
+      // Try to show an alert to the user
+      if (typeof window !== 'undefined') {
+        alert(
+          `Storage limit exceeded (${sizeInMB}MB). ` +
+          `The workflow contains too much data. ` +
+          `Try importing with fewer images or remove some existing workflows.`
+        );
+      }
+    }
   }
 };
 
