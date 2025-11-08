@@ -71,23 +71,6 @@ export function ManageWorkflowView({
     }
   }, [project.workflows, project.id, onUpdateWorkflow]);
 
-  const handleBackNavigation = () => {
-    if (actualSelectedWorkflow) {
-      if (_onBackToWorkflows) {
-        _onBackToWorkflows();
-        return;
-      }
-      navigate(`/projects/${project.id}`);
-      return;
-    }
-
-    if (_onBack) {
-      _onBack();
-      return;
-    }
-
-    navigate('/projects');
-  };
 
   const handleAdd = () => {
     setCurrentWorkflow(null);

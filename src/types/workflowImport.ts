@@ -1,4 +1,4 @@
-import { Task, KnowledgeItem } from './index';
+// Types for workflow import parsing
 
 export interface ParsedWorkflow {
   title: string;
