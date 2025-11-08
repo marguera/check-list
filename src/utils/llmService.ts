@@ -61,6 +61,64 @@ export async function convertTextToWorkflowYAML(
 }
 
 /**
+ * Convert extracted text to YAML workflow format using LLM with streaming
+ * Yields tokens as they are generated
+ */
+export async function* convertTextToWorkflowYAMLStream(
+  extractedText: string
+): AsyncGenerator<string, void, unknown> {
+  const config = await loadLLMConfig();
+
+  if (!config.apiKey) {
+    throw new Error('LLM API key is not configured. Please set it in config.json');
+  }
+
+  const prompt = generateWorkflowPrompt(extractedText);
+
+  let model: BaseChatModel;
+  if (config.provider === 'openai') {
+    model = new ChatOpenAI({
+      modelName: config.model,
+      openAIApiKey: config.apiKey,
+      temperature: 0.3,
+      streaming: true,
+    });
+  } else if (config.provider === 'anthropic') {
+    model = new ChatAnthropic({
+      modelName: config.model,
+      anthropicApiKey: config.apiKey,
+      temperature: 0.3,
+      streaming: true,
+    });
+  } else if (config.provider === 'gemini') {
+    model = new ChatGoogleGenerativeAI({
+      model: config.model,
+      apiKey: config.apiKey,
+      temperature: 0.3,
+      streaming: true,
+    });
+  } else {
+    throw new Error(`Unsupported LLM provider: ${config.provider}`);
+  }
+
+  try {
+    const stream = await model.stream([
+      new HumanMessage(prompt),
+    ]);
+
+    for await (const chunk of stream) {
+      const content = chunk.content;
+      if (typeof content === 'string' && content) {
+        yield content;
+      }
+    }
+  } catch (error: any) {
+    console.error('LLM streaming error:', error);
+    throw new Error(`LLM streaming failed: ${error.message || 'Unknown error'}`);
+  }
+}
+
+/**
  * Generate the workflow conversion prompt
  */
 function generateWorkflowPrompt(extractedText: string): string {

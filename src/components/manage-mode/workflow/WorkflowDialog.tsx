@@ -6,7 +6,8 @@ import { Upload, Loader2 } from 'lucide-react';
 import { extractFromZip, processHtmlContent } from '../../../utils/zipProcessing';
 import { parseWorkflowImport, convertParsedWorkflowToTasks } from '../../../utils/workflowImport';
 import { compressImageMap } from '../../../utils/imageCompression';
-import { convertTextToWorkflowYAML } from '../../../utils/llmService';
+import { convertTextToWorkflowYAMLStream } from '../../../utils/llmService';
+import { StreamingDisplay } from './StreamingDisplay';
 
 interface WorkflowDialogProps {
   open: boolean;
@@ -35,6 +36,7 @@ export function WorkflowDialog({
   const [sourceFile, setSourceFile] = useState<File | null>(null);
   const [extractedText, setExtractedText] = useState('');
   const [yamlText, setYamlText] = useState('');
+  const [streamingContent, setStreamingContent] = useState('');
   const [processing, setProcessing] = useState(false);
   const [converting, setConverting] = useState(false);
   const [imageMap, setImageMap] = useState<Map<string, string>>(new Map());
@@ -58,6 +60,7 @@ export function WorkflowDialog({
       setSourceFile(null);
       setExtractedText('');
       setYamlText('');
+      setStreamingContent('');
       setImageMap(new Map());
       setImportErrors([]);
       setImportWarnings([]);
@@ -140,15 +143,28 @@ export function WorkflowDialog({
     }
 
     setConverting(true);
+    setStreamingContent('');
     setImportErrors([]);
     setImportWarnings([]);
 
     try {
-      const yamlResult = await convertTextToWorkflowYAML(extractedText);
-      setYamlText(yamlResult);
+      let fullYamlText = '';
+      
+      // Stream the response
+      for await (const chunk of convertTextToWorkflowYAMLStream(extractedText)) {
+        fullYamlText += chunk;
+        setStreamingContent(fullYamlText);
+      }
+
+      // Extract YAML from markdown code blocks if present
+      const yamlMatch = fullYamlText.match(/```yaml\n([\s\S]*?)\n```/) || 
+                        fullYamlText.match(/```\n([\s\S]*?)\n```/);
+      
+      const finalYaml = yamlMatch ? yamlMatch[1] : fullYamlText.trim();
+      setYamlText(finalYaml);
       
       // Automatically validate and parse
-      const result = parseWorkflowImport(yamlResult, knowledgeItems, imageMap);
+      const result = parseWorkflowImport(finalYaml, knowledgeItems, imageMap);
       if (result.errors.length > 0) {
         setImportErrors(result.errors);
       }
@@ -406,6 +422,16 @@ export function WorkflowDialog({
                 <p className="text-xs text-white/50 mt-2 text-center">
                   Click to convert the extracted content to a workflow format
                 </p>
+              </div>
+            )}
+
+            {/* Streaming Display - Show during conversion */}
+            {converting && (
+              <div>
+                <label className="block text-sm font-semibold uppercase tracking-wide text-white/70 mb-2">
+                  Generating Workflow...
+                </label>
+                <StreamingDisplay content={streamingContent} isStreaming={converting} />
               </div>
             )}
 
