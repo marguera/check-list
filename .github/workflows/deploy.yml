@@ -37,9 +37,22 @@ jobs:
           PROVIDER="${{ secrets.LLM_PROVIDER }}"
           MODEL="${{ secrets.LLM_MODEL }}"
           API_KEY="${{ secrets.LLM_API_KEY }}"
-          PROVIDER=${PROVIDER:-gemini}
-          MODEL=${MODEL:-gemini-1.5-pro}
-          API_KEY=${API_KEY:-}
+          
+          # Use secrets if provided, otherwise use defaults
+          if [ -z "$PROVIDER" ]; then
+            PROVIDER="gemini"
+          fi
+          if [ -z "$MODEL" ]; then
+            MODEL="gemini-1.5-flash"
+          fi
+          if [ -z "$API_KEY" ]; then
+            API_KEY=""
+          fi
+          
+          echo "Using provider: $PROVIDER"
+          echo "Using model: $MODEL"
+          echo "API key set: $([ -z "$API_KEY" ] && echo "NO" || echo "YES")"
+          
           echo "{
             \"llm\": {
               \"provider\": \"${PROVIDER}\",
