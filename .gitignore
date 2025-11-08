@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# LLM Configuration (contains API keys)
+public/config.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

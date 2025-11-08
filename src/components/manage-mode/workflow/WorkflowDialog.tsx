@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Project, KnowledgeItem, Task } from '../../../types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { Button } from '../../ui/button';
-import { Upload, Loader2, FileText, Copy } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 import { extractFromZip, processHtmlContent } from '../../../utils/zipProcessing';
 import { parseWorkflowImport, convertParsedWorkflowToTasks } from '../../../utils/workflowImport';
 import { compressImageMap } from '../../../utils/imageCompression';
+import { convertTextToWorkflowYAML } from '../../../utils/llmService';
 
 interface WorkflowDialogProps {
   open: boolean;
@@ -32,16 +33,15 @@ export function WorkflowDialog({
   const [description, setDescription] = useState('');
   const [importMode, setImportMode] = useState<'create' | 'import'>('create');
   const [sourceFile, setSourceFile] = useState<File | null>(null);
-  const [fileType, setFileType] = useState<'zip' | null>(null);
   const [extractedText, setExtractedText] = useState('');
   const [yamlText, setYamlText] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [converting, setConverting] = useState(false);
   const [imageMap, setImageMap] = useState<Map<string, string>>(new Map());
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
-  const [promptDialogOpen, setPromptDialogOpen] = useState(false);
+  const [parsedWorkflow, setParsedWorkflow] = useState<{ title: string; description: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -56,12 +56,12 @@ export function WorkflowDialog({
       }
       // Reset import state
       setSourceFile(null);
-      setFileType(null);
       setExtractedText('');
       setYamlText('');
       setImageMap(new Map());
       setImportErrors([]);
       setImportWarnings([]);
+      setParsedWorkflow(null);
     }
   }, [open, workflow]);
 
@@ -76,175 +76,103 @@ export function WorkflowDialog({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Determine file type - only ZIP supported
-    let detectedType: 'zip' | null = null;
+    // Validate ZIP file
     if (
-      file.type === 'application/zip' ||
-      file.type === 'application/x-zip-compressed' ||
-      file.name.toLowerCase().endsWith('.zip')
+      !(file.type === 'application/zip' ||
+        file.type === 'application/x-zip-compressed' ||
+        file.name.toLowerCase().endsWith('.zip'))
     ) {
-      detectedType = 'zip';
-    } else {
       alert('Please select a valid ZIP file');
       return;
     }
 
     setSourceFile(file);
-    setFileType(detectedType);
     setProcessing(true);
     setImportErrors([]);
     setImportWarnings([]);
 
     try {
-      if (detectedType === 'zip') {
-        // Extract HTML and images from ZIP
-        const { htmlContent, images } = await extractFromZip(file);
-        
-        // Process HTML to replace image references with placeholders
-        const { text, imagePlaceholders } = processHtmlContent(htmlContent, images);
-        
-        // Create a map of placeholder -> image data URL
-        const placeholderMap = new Map<string, string>();
-        for (const [placeholder, imagePath] of imagePlaceholders.entries()) {
-          const imageData = images.get(imagePath);
-          if (imageData) {
-            placeholderMap.set(placeholder, imageData);
-          }
+      // Extract HTML and images from ZIP
+      const { htmlContent, images } = await extractFromZip(file);
+      
+      // Process HTML to replace image references with placeholders
+      const { text, imagePlaceholders } = processHtmlContent(htmlContent, images);
+      
+      // Create a map of placeholder -> image data URL
+      const placeholderMap = new Map<string, string>();
+      for (const [placeholder, imagePath] of imagePlaceholders.entries()) {
+        const imageData = images.get(imagePath);
+        if (imageData) {
+          placeholderMap.set(placeholder, imageData);
         }
-        
-        // Compress images to reduce storage size
-        let compressedMap = placeholderMap;
-        if (placeholderMap.size > 0) {
-          console.log(`Compressing ${placeholderMap.size} images from ZIP...`);
-          compressedMap = await compressImageMap(placeholderMap);
-          const totalSize = Array.from(compressedMap.values())
-            .reduce((sum, dataUrl) => sum + (dataUrl.length * 3 / 4), 0) / (1024 * 1024);
-          console.log(`Total compressed image size: ${totalSize.toFixed(2)}MB`);
-        }
-        
-        setImageMap(compressedMap);
-        setExtractedText(text);
-        
-        if (compressedMap.size === 0) {
-          setImportWarnings(['No images found in ZIP archive. Text extraction will continue without images.']);
-        } else {
-          setImportWarnings([]);
-        }
+      }
+      
+      // Compress images to reduce storage size
+      let compressedMap = placeholderMap;
+      if (placeholderMap.size > 0) {
+        console.log(`Compressing ${placeholderMap.size} images from ZIP...`);
+        compressedMap = await compressImageMap(placeholderMap);
+        const totalSize = Array.from(compressedMap.values())
+          .reduce((sum, dataUrl) => sum + (dataUrl.length * 3 / 4), 0) / (1024 * 1024);
+        console.log(`Total compressed image size: ${totalSize.toFixed(2)}MB`);
+      }
+      
+      setImageMap(compressedMap);
+      setExtractedText(text);
+      
+      if (compressedMap.size === 0) {
+        setImportWarnings(['No images found in ZIP archive. Text extraction will continue without images.']);
+      } else {
+        setImportWarnings([]);
       }
     } catch (error: any) {
       setImportErrors([`Failed to process ZIP file: ${error.message}`]);
       setSourceFile(null);
-      setFileType(null);
     } finally {
       setProcessing(false);
     }
   };
 
-  const handleYamlChange = (text: string) => {
-    setYamlText(text);
+  const handleConvert = async () => {
+    if (!extractedText.trim()) {
+      setImportErrors(['No extracted text available. Please upload a ZIP file first.']);
+      return;
+    }
+
+    setConverting(true);
     setImportErrors([]);
     setImportWarnings([]);
 
-    // Try to parse and validate
-    if (text.trim()) {
-      try {
-        const result = parseWorkflowImport(text, knowledgeItems, imageMap);
-        if (result.errors.length > 0) {
-          setImportErrors(result.errors);
-        }
-        if (result.warnings.length > 0) {
-          setImportWarnings(result.warnings);
-        }
-        if (result.workflow.title) {
-          setTitle(result.workflow.title);
-          setDescription(result.workflow.description);
-        }
-      } catch (error) {
-        // Validation errors are already set
+    try {
+      const yamlResult = await convertTextToWorkflowYAML(extractedText);
+      setYamlText(yamlResult);
+      
+      // Automatically validate and parse
+      const result = parseWorkflowImport(yamlResult, knowledgeItems, imageMap);
+      if (result.errors.length > 0) {
+        setImportErrors(result.errors);
       }
+      if (result.warnings.length > 0) {
+        setImportWarnings(result.warnings);
+      }
+      if (result.workflow.title) {
+        setTitle(result.workflow.title);
+        setDescription(result.workflow.description);
+        setParsedWorkflow({
+          title: result.workflow.title,
+          description: result.workflow.description,
+        });
+      }
+    } catch (error: any) {
+      setImportErrors([`Conversion failed: ${error.message || 'Unknown error'}`]);
+    } finally {
+      setConverting(false);
     }
-  };
-
-  const generateFullPrompt = (): string => {
-    const promptTemplate = `You are a workflow conversion assistant. Convert the following text (extracted from a ZIP file) into a structured YAML workflow format.
-
-If the text contains image placeholders like [IMAGE:image-1], preserve them exactly as they appear in the instructions field.
-
-Output format (YAML):
-
-\`\`\`yaml
-workflow:
-  title: "Workflow Title"
-  description: "Optional workflow description"
-
-tasks:
-  - step: 1
-    title: "Task Title"
-    description: "Task description"
-    importance: "high"  # optional: "low" | "high"
-    image: "image-1"  # optional: reference to an image placeholder (e.g., "image-1", "image-2") that exists in instructions. This will be used as the task list image.
-    instructions: |
-      <p>HTML content for instructions</p>
-      <p>Reference images using: [IMAGE:image-1] or [IMAGE:image-2]</p>
-\`\`\`
-
-## Format Rules:
-
-1. **Workflow**:
-   - \`title\` (required): The workflow title
-   - \`description\` (optional): Brief description of the workflow
-
-2. **Tasks**:
-   - Each task must have a \`step\` number (sequential: 1, 2, 3, ...)
-   - \`title\` (required): Task title
-   - \`description\` (optional): Brief task description
-   - \`importance\` (optional): "low" or "high"
-   - \`image\` (optional): Reference to an image placeholder (e.g., "image-1", "image-2") that exists in the instructions. This image will be displayed in the task list. Use the placeholder name that appears in the instructions (e.g., [IMAGE:image-1] means use "image-1"). If not set, no image will show in the task list.
-   - \`instructions\` (required): HTML-formatted instructions. Use HTML tags like <p>, <ul>, <ol>, <li>, <strong>, <em>, etc.
-   - If the input text contains image placeholders like \`[IMAGE:image-1]\`, preserve them exactly in the instructions
-
-3. **HTML Instructions**:
-   - Use proper HTML tags
-   - Use semantic HTML: <p> for paragraphs, <ul>/<ol> for lists, <strong> for emphasis, etc.
-   - If the input contains image placeholders like \`[IMAGE:image-1]\`, preserve them exactly as they appear
-
-## Instructions:
-
-1. Analyze the input text and identify distinct tasks/steps
-2. Extract workflow title and description from the content
-3. For each task, create a structured entry with:
-   - Step number
-   - Title (concise, action-oriented)
-   - Description (brief summary)
-   - Instructions (detailed HTML-formatted content)
-4. If the input contains image placeholders like [IMAGE:image-1], preserve them exactly in the instructions
-5. Output only valid YAML, ready to be parsed
-
-## Input Text:
-
-${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE PLACEHOLDERS]'}`;
-    
-    return promptTemplate;
-  };
-
-  const handleCopyPrompt = () => {
-    const prompt = generateFullPrompt();
-    navigator.clipboard.writeText(prompt).then(() => {
-      // Show feedback (you could use a toast notification here)
-      alert('Prompt copied to clipboard!');
-    }).catch(() => {
-      // Fallback: select text in textarea
-      if (promptTextareaRef.current) {
-        promptTextareaRef.current.select();
-        document.execCommand('copy');
-        alert('Prompt copied to clipboard!');
-      }
-    });
   };
 
   const handleImport = () => {
     if (!yamlText.trim()) {
-      setImportErrors(['Please paste the YAML workflow format']);
+      setImportErrors(['No workflow data to import. Please upload a ZIP file first.']);
       return;
     }
 
@@ -253,14 +181,11 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
       return;
     }
 
+    if (importErrors.length > 0) {
+      return; // Don't import if there are errors
+    }
+
     try {
-      // Debug: log imageMap state before parsing
-      console.log('Importing with imageMap:', {
-        size: imageMap.size,
-        keys: Array.from(imageMap.keys()),
-        sampleKey: imageMap.size > 0 ? Array.from(imageMap.keys())[0] : null,
-      });
-      
       const result = parseWorkflowImport(yamlText, knowledgeItems, imageMap);
       
       if (result.errors.length > 0) {
@@ -292,11 +217,6 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
           description: result.workflow.description,
           tasks,
         });
-      }
-
-      // Show warnings if any
-      if (result.warnings.length > 0) {
-        setImportWarnings(result.warnings);
       }
 
       onOpenChange(false);
@@ -364,49 +284,6 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
         </DialogContent>
       </Dialog>
 
-      {/* Prompt Dialog */}
-      <Dialog open={promptDialogOpen} onOpenChange={setPromptDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#1F1F20] text-white border border-white/20">
-          <DialogHeader>
-            <DialogTitle className="text-white uppercase tracking-wide">
-              LLM Prompt Template
-            </DialogTitle>
-            <DialogDescription className="text-white/70">
-              Copy this prompt and use it with your LLM to convert the extracted text to workflow format
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="flex justify-end">
-              <Button
-                onClick={handleCopyPrompt}
-                className="bg-white/10 border border-white/20 text-white hover:bg-white/20 flex items-center gap-2"
-              >
-                <Copy className="w-4 h-4" />
-                Copy Prompt
-              </Button>
-            </div>
-            <textarea
-              ref={promptTextareaRef}
-              value={generateFullPrompt()}
-              readOnly
-              rows={20}
-              className="w-full px-3 py-2 border border-white/20 rounded-md bg-[#19191A] text-white/80 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40 resize-none font-mono text-xs"
-            />
-            <p className="text-xs text-white/50">
-              The extracted text has been automatically inserted into the prompt. Copy the entire prompt above and paste it into your LLM.
-            </p>
-          </div>
-          <div className="flex justify-end gap-2 pt-4 border-t border-white/20">
-            <Button
-              variant="default"
-              onClick={() => setPromptDialogOpen(false)}
-              className="bg-transparent border border-white/20 text-white hover:bg-white/10"
-            >
-              Close
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
       </>
     );
   }
@@ -495,7 +372,7 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
                 />
                 <Button
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={processing}
+                  disabled={processing || converting}
                   className="bg-white/10 border border-white/20 text-white hover:bg-white/20"
                 >
                   <Upload className="w-4 h-4 mr-2" />
@@ -504,10 +381,10 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
                 {sourceFile && (
                   <span className="text-sm text-white/70">{sourceFile.name}</span>
                 )}
-                {processing && (
+                {(processing || converting) && (
                   <div className="flex items-center gap-2 text-sm text-white/70">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Processing {fileType?.toUpperCase()}...
+                    {processing ? 'Processing ZIP...' : 'Converting to workflow...'}
                   </div>
                 )}
               </div>
@@ -516,48 +393,36 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
               </p>
             </div>
 
-            {/* Extracted Text */}
-            {extractedText && (
+            {/* Convert Button - Show after file is processed but before conversion */}
+            {extractedText && !parsedWorkflow && !converting && (
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-semibold uppercase tracking-wide text-white/70">
-                    Extracted Text (for LLM conversion)
-                  </label>
-                  <Button
-                    onClick={() => setPromptDialogOpen(true)}
-                    size="sm"
-                    className="bg-white/10 border border-white/20 text-white hover:bg-white/20 flex items-center gap-2"
-                  >
-                    <FileText className="w-4 h-4" />
-                    View Prompt
-                  </Button>
-                </div>
-                <textarea
-                  value={extractedText}
-                  readOnly
-                  rows={8}
-                  className="w-full px-3 py-2 border border-white/20 rounded-md bg-[#19191A] text-white/80 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40 resize-none font-mono text-xs"
-                  placeholder="Text will appear here after upload"
-                />
-                <p className="text-xs text-white/50 mt-1">
-                  Click "View Prompt" to see the full LLM prompt with this text inserted
+                <Button
+                  onClick={handleConvert}
+                  disabled={processing || converting}
+                  className="bg-white text-[#19191A] hover:bg-white/90 disabled:opacity-50 w-full"
+                >
+                  Convert to Workflow
+                </Button>
+                <p className="text-xs text-white/50 mt-2 text-center">
+                  Click to convert the extracted content to a workflow format
                 </p>
               </div>
             )}
 
-            {/* YAML Input */}
-            <div>
-              <label className="block text-sm font-semibold uppercase tracking-wide text-white/70 mb-2">
-                Paste YAML Workflow Format
-              </label>
-              <textarea
-                value={yamlText}
-                onChange={(e) => handleYamlChange(e.target.value)}
-                rows={12}
-                className="w-full px-3 py-2 border border-white/20 rounded-md bg-[#19191A] text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40 resize-none font-mono text-xs"
-                placeholder="Paste the YAML output from your LLM here..."
-              />
-            </div>
+            {/* Preview */}
+            {parsedWorkflow && importErrors.length === 0 && (
+              <div className="bg-white/5 border border-white/10 rounded-md p-3">
+                <p className="text-sm font-semibold text-white/70 mb-2">Ready to Import:</p>
+                <p className="text-sm text-white/80">
+                  <strong>Title:</strong> {parsedWorkflow.title}
+                </p>
+                {parsedWorkflow.description && (
+                  <p className="text-sm text-white/80 mt-1">
+                    <strong>Description:</strong> {parsedWorkflow.description}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Errors */}
             {importErrors.length > 0 && (
@@ -582,21 +447,6 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
                 </ul>
               </div>
             )}
-
-            {/* Preview */}
-            {yamlText && title && importErrors.length === 0 && (
-              <div className="bg-white/5 border border-white/10 rounded-md p-3">
-                <p className="text-sm font-semibold text-white/70 mb-2">Preview:</p>
-                <p className="text-sm text-white/80">
-                  <strong>Title:</strong> {title}
-                </p>
-                {description && (
-                  <p className="text-sm text-white/80 mt-1">
-                    <strong>Description:</strong> {description}
-                  </p>
-                )}
-              </div>
-            )}
           </div>
         )}
 
@@ -619,7 +469,7 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
           ) : (
             <Button
               onClick={handleImport}
-              disabled={!yamlText.trim() || importErrors.length > 0 || processing}
+              disabled={!parsedWorkflow || importErrors.length > 0 || processing || converting}
               className="bg-white text-[#19191A] hover:bg-white/90 disabled:opacity-50"
             >
               Import Workflow
@@ -629,49 +479,6 @@ ${extractedText || '[PASTE THE EXTRACTED TEXT HERE (from ZIP), INCLUDING IMAGE P
       </DialogContent>
     </Dialog>
 
-    {/* Prompt Dialog */}
-    <Dialog open={promptDialogOpen} onOpenChange={setPromptDialogOpen}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#1F1F20] text-white border border-white/20">
-        <DialogHeader>
-          <DialogTitle className="text-white uppercase tracking-wide">
-            LLM Prompt Template
-          </DialogTitle>
-          <DialogDescription className="text-white/70">
-            Copy this prompt and use it with your LLM to convert the extracted text to workflow format
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="flex justify-end">
-            <Button
-              onClick={handleCopyPrompt}
-              className="bg-white/10 border border-white/20 text-white hover:bg-white/20 flex items-center gap-2"
-            >
-              <Copy className="w-4 h-4" />
-              Copy Prompt
-            </Button>
-          </div>
-          <textarea
-            ref={promptTextareaRef}
-            value={generateFullPrompt()}
-            readOnly
-            rows={20}
-            className="w-full px-3 py-2 border border-white/20 rounded-md bg-[#19191A] text-white/80 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40 resize-none font-mono text-xs"
-          />
-          <p className="text-xs text-white/50">
-            The extracted text has been automatically inserted into the prompt. Copy the entire prompt above and paste it into your LLM.
-          </p>
-        </div>
-        <div className="flex justify-end gap-2 pt-4 border-t border-white/20">
-          <Button
-            variant="default"
-            onClick={() => setPromptDialogOpen(false)}
-            className="bg-transparent border border-white/20 text-white hover:bg-white/10"
-          >
-            Close
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
     </>
   );
 }

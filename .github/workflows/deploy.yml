@@ -31,6 +31,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Generate config.json from secrets
+        run: |
+          mkdir -p public
+          echo '{
+            "llm": {
+              "provider": "${{ secrets.LLM_PROVIDER || "gemini" }}",
+              "model": "${{ secrets.LLM_MODEL || "gemini-1.5-flash" }}",
+              "apiKey": "${{ secrets.LLM_API_KEY || "" }}"
+            }
+          }' > public/config.json
+        shell: bash
+      
       - name: Build
         run: npm run build
       
